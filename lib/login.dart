@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'primary_button.dart';
-import 'package:dttn_khtn/LoginAPI.dart';
+import 'package:dttn_khtn/loginAPI.dart';
+import 'common/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'model/user.dart';
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title, this.onSignIn}) : super(key: key);
   final String title;
@@ -32,13 +34,42 @@ class _LoginPageState extends State<LoginPage> {
     return false;
   }
 
-  void validateAndSubmit()  {
-    LoginAPI.signInWithGoogle();
-//      switch(type){
-//        case 'GGLOGIN':
-//
-//          break;
-//      }
+  void validateAndSubmit(String type) async {
+//    User user = new User("","","","fuk5icTo2OM:APA91bHpXJwoaDlyQoowg42OLNwty8W1rUQmXXq5XHCEnpBFm2qVNS1k2mGb2ZuaR6081piYAhk0QYbbubng5qBv0G-ZsiYHiszDbnFz75louAfB93_GuQn5t8pnMLaU69mo0glA4MjD");
+//    LoginAPI.sendNotification(user);
+    switch (type){
+      case GGLOGIN:
+        LoginAPI.signInWithGoogle()
+            .then((user) =>LoginAPI.saveUserToFirebase(user));
+
+        break;
+      case EMAILLOGIN:
+        if (validateAndSave()) {
+          try {
+            FirebaseUser user = _formType == FormType.login
+                ? await LoginAPI.emailLogin(_email, _password)
+                : await LoginAPI.createUser(_email, _password);
+            var userId = user.uid;
+            setState(() {
+              _authHint = 'Signed In\n\nUser id: $userId';
+            });
+            widget.onSignIn();
+          }
+          catch (e) {
+            setState(() {
+              _authHint = 'Sign In Error\n\n${e.toString()}';
+            });
+          }
+        } else {
+          setState(() {
+            _authHint = '';
+          });
+        }
+        break;
+      case EMAILREG:
+
+        break;
+    }
   }
 
   void moveToRegister() {
@@ -85,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
               key: new Key('login'),
               text: 'Login',
               height: 44.0,
-              onPressed: validateAndSubmit
+              onPressed:()=> validateAndSubmit(EMAILLOGIN)
           ),
           new FlatButton(
               key: new Key('need-account'),
@@ -94,9 +125,9 @@ class _LoginPageState extends State<LoginPage> {
           ),
           new PrimaryButton(
               key: new Key('ggLogin'),
-              text: 'Đăng nhập bằng google',
+              text: 'Login with Google',
               height: 44.0,
-              onPressed: validateAndSubmit
+              onPressed:()=> validateAndSubmit(GGLOGIN)
           ),
         ];
       case FormType.register:
@@ -105,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
               key: new Key('register'),
               text: 'Create an account',
               height: 44.0,
-              onPressed: validateAndSubmit
+              onPressed:()=> validateAndSubmit(EMAILLOGIN)
           ),
           new FlatButton(
               key: new Key('need-login'),
