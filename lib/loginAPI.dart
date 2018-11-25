@@ -8,6 +8,7 @@ import 'common/constants.dart';
 import 'package:http/http.dart' as http;
 
 
+
 class LoginAPI {
   static FirebaseAuth _auth = FirebaseAuth.instance;
   static GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -36,17 +37,19 @@ class LoginAPI {
 
     final FirebaseUser currentUser = await _auth.currentUser();
     assert(user.uid == currentUser.uid);
-
+    saveUserToFirebase(user);
     return user;
   }
 
   static Future<FirebaseUser> emailLogin(String email, String password) async{
     FirebaseUser user = await _auth.signInWithEmailAndPassword(email: email, password: password);
+
     return user;
   }
 
   static Future<FirebaseUser> createUser(String email, String password) async {
     FirebaseUser user = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+    saveUserToFirebase(user);
     return user;
   }
 

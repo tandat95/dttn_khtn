@@ -39,9 +39,15 @@ class _LoginPageState extends State<LoginPage> {
 //    LoginAPI.sendNotification(user);
     switch (type){
       case GGLOGIN:
-        LoginAPI.signInWithGoogle()
-            .then((user) =>LoginAPI.saveUserToFirebase(user));
-
+        try {
+         FirebaseUser user = await LoginAPI.signInWithGoogle();
+         widget.onSignIn();
+        }
+        catch (e) {
+          setState(() {
+            _authHint = 'Sign In Error\n\n${e.toString()}';
+          });
+        }
         break;
       case EMAILLOGIN:
         if (validateAndSave()) {
@@ -87,19 +93,34 @@ class _LoginPageState extends State<LoginPage> {
       _authHint = '';
     });
   }
+  List<Widget> appLogo(){
+    return [
+      Image.asset(
+        'images/logo_man_run.png',
+        height: 64.0,
+        width: 64.0,
+      ),
+    ];
+  }
 
   List<Widget> usernameAndPassword() {
     return [
       padded(child: new TextFormField(
         key: new Key('email'),
-        decoration: new InputDecoration(labelText: 'Email'),
+        decoration: new InputDecoration(
+            labelText: 'Email',
+          suffixIcon: Icon(Icons.email),
+        ),
         autocorrect: false,
         validator: (val) => val.isEmpty ? 'Email can\'t be empty.' : null,
         onSaved: (val) => _email = val,
       )),
       padded(child: new TextFormField(
         key: new Key('password'),
-        decoration: new InputDecoration(labelText: 'Password'),
+        decoration: new InputDecoration(
+          labelText: 'Password',
+          suffixIcon: Icon(Icons.lock),
+        ),
         obscureText: true,
         autocorrect: false,
         validator: (val) => val.isEmpty ? 'Password can\'t be empty.' : null,
@@ -166,30 +187,42 @@ class _LoginPageState extends State<LoginPage> {
           title: new Text(widget.title),
         ),
         backgroundColor: Colors.grey[300],
-        body: new SingleChildScrollView(child: new Container(
-            padding: const EdgeInsets.all(16.0),
-            child: new Column(
-                children: [
-                  new Card(
-                      child: new Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            new Container(
-                                padding: const EdgeInsets.all(16.0),
-                                child: new Form(
-                                    key: formKey,
-                                    child: new Column(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                                      children: usernameAndPassword() + submitWidgets(),
-                                    )
-                                )
-                            ),
-                          ])
-                  ),
-                  hintText()
-                ]
-            )
-        ))
+        body: new SingleChildScrollView(
+          child: new Container(
+//                decoration: new BoxDecoration(
+//                  image: new DecorationImage(
+//                    image: new AssetImage("images/login_bg.jpg"),
+//                    fit: BoxFit.fill,
+//                  ),
+//                ),
+              padding: const EdgeInsets.all(16.0),
+              child: new Column(
+                  children: [
+                    new Card(
+
+                        child: new Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              new Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: new Form(
+                                      key: formKey,
+                                      child: new Column(
+                                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                                        children: (
+                                            appLogo() + usernameAndPassword() + submitWidgets()
+                                        ),
+                                      )
+                                  )
+                              ),
+                            ])
+                    ),
+                    hintText()
+                  ]
+              ),
+          ),
+        ),
+
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:dttn_khtn/loginAPI.dart';
+import 'package:dttn_khtn/widget/user_list.dart';
+import 'package:dttn_khtn/widget/placeholder_widget.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title, this.onSignOut}) : super(key: key);
@@ -13,7 +14,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  int _currentIndex =0;
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+  final List<Widget> _children = [
+    new ListUser(),
+    new PlaceholderWidget(Colors.red, "Message"),
+    new PlaceholderWidget(Colors.blue, "Profile"),
+  ];
 
   @override
   void initState() {
@@ -42,66 +49,37 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter++;
     });
   }
+  void onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            DrawerHeader(
-              child: Text("header"),
-              decoration: BoxDecoration(
-                  color:
-              ),
+//        appBar: AppBar(
+//          title: Text(widget.title),
+//        ),
+        bottomNavigationBar: BottomNavigationBar(
+          onTap: onTabTapped,
+          currentIndex: _currentIndex, // this will be set when a new tab is tapped
+          items: [
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.home),
+              title: new Text('Home'),
             ),
-            ListTile(
-              title: Text('Trang chủ'),
-              leading: Icon(
-                Icons.home,
-                color: Colors.blue[500],
-              ),
-              onTap: (){
-                Navigator.pop(context);
-              },
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.mail),
+              title: new Text('Messages'),
             ),
-
-            ListTile(
-              title: Text('Sign out'),
-              leading: Icon(
-                Icons.assignment_return,
-                color: Colors.blue[500],
-              ),
-              onTap: (){
-                Navigator.pop(context);
-                widget.onSignOut();
-              },
-            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                title: Text('Profile')
+            )
           ],
         ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+        body:  _children[_currentIndex],
+      );
   }
 }
