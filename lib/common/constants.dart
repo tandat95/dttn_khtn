@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 const HORIZONTAL = 0;
 const VERTICAL = 1;
 const DIAGONAL_ASCENDING = 2;
@@ -13,3 +15,7 @@ const USER_LIST = 'userList';
 const GGLOGIN ='googleLogin';
 const EMAILLOGIN ='emailLogin';
 const EMAILREG = 'emailReg';
+final themeColor = new Color(0xfff5a623);
+final primaryColor = new Color(0xff203152);
+final greyColor = new Color(0xffaeaeae);
+final greyColor2 = new Color(0xffE8E8E8);

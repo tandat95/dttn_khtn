@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:dttn_khtn/widget/user_list.dart';
 import 'package:dttn_khtn/widget/placeholder_widget.dart';
+import 'package:dttn_khtn/widget/chat_list.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title, this.onSignOut}) : super(key: key);
@@ -18,7 +19,7 @@ class _MyHomePageState extends State<MyHomePage> {
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   final List<Widget> _children = [
     new ListUser(),
-    new PlaceholderWidget(Colors.red, "Message"),
+    new ChatList(),
     new PlaceholderWidget(Colors.blue, "Profile"),
   ];
 
