@@ -6,6 +6,7 @@ import 'model/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'common/constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 
@@ -67,6 +68,17 @@ class LoginAPI {
   }
 
   static Future<void> saveUserToFirebase(FirebaseUser user) async {
+      if (user != null) {
+        // Check is already sign up
+          final QuerySnapshot result =
+          await Firestore.instance.collection('users').where('id', isEqualTo: user.uid).getDocuments();
+          final List<DocumentSnapshot> documents = result.documents;
+          if (documents.length == 0) {
+          // Update data to server if new user
+              Firestore.instance.collection('users').document(user.uid).setData(
+              {'nickname': user.displayName, 'photoUrl': user.photoUrl, 'id': user.uid});
+          }
+      }
       var token = await _firebaseMessaging.getToken();
       var update = {
         'name': user.displayName,

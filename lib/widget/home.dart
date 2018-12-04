@@ -1,27 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:dttn_khtn/widget/user_list.dart';
-import 'package:dttn_khtn/widget/placeholder_widget.dart';
 import 'package:dttn_khtn/widget/chat_list.dart';
+import 'package:dttn_khtn/widget/my_profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title, this.onSignOut}) : super(key: key);
+  MyHomePage({Key key, this.title,this.user, this.onSignOut}) : super(key: key);
   final VoidCallback onSignOut;
   final String title;
-
+  final FirebaseUser user;
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
   int _currentIndex =0;
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
-  final List<Widget> _children = [
-    new ListUser(),
-    new ChatList(),
-    new PlaceholderWidget(Colors.blue, "Profile"),
-  ];
 
   @override
   void initState() {
@@ -44,12 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
       print(token);
     });
   }
-  void _incrementCounter() {
-    //Navigator.of(context).pushNamed('main');
-    setState(() {
-      _counter++;
-    });
-  }
+
   void onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
@@ -58,10 +48,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    //widget.user.uid
+    final List<Widget> _children = [
+      new ListUser(),
+      new ChatList(),
+      new MyProfile(),
+    ];
     return Scaffold(
-//        appBar: AppBar(
-//          title: Text(widget.title),
-//        ),
         bottomNavigationBar: BottomNavigationBar(
           onTap: onTabTapped,
           currentIndex: _currentIndex, // this will be set when a new tab is tapped

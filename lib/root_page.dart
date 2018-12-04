@@ -3,6 +3,7 @@ import 'login.dart';
 import 'widget/home.dart';
 import 'package:dttn_khtn/loginAPI.dart';
 import 'package:dttn_khtn/widget/home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RootPage extends StatefulWidget {
   RootPage({Key key}) : super(key: key);
@@ -17,11 +18,13 @@ enum AuthStatus {
 
 class _RootPageState extends State<RootPage> {
   AuthStatus authStatus = AuthStatus.notSignedIn;
+  FirebaseUser firebaseUser = null;
   initState() {
     super.initState();
     LoginAPI.currentUser().then((user) {
       setState(() {
         authStatus = user != null ? AuthStatus.signedIn : AuthStatus.notSignedIn;
+        firebaseUser = user;
       });
     });
   }
@@ -43,6 +46,7 @@ class _RootPageState extends State<RootPage> {
       case AuthStatus.signedIn:
         return new MyHomePage(
           title: 'Home',
+          user: firebaseUser,
           onSignOut: () => _updateAuthStatus(AuthStatus.notSignedIn),
         );
     }

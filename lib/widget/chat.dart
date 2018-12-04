@@ -7,7 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:dttn_khtn/common/constants.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-//import 'package:image_picker/image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -90,7 +90,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   readLocal() async {
     prefs = await SharedPreferences.getInstance();
-    id = prefs.getString('id') ?? '';
+    id = prefs.getString(USER_ID) ?? '';
     if (id.hashCode <= peerId.hashCode) {
       groupChatId = '$id-$peerId';
     } else {
@@ -100,17 +100,16 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {});
   }
 
-//  Future getImage() async {
-//    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
-//
-//    if (imageFile != null) {
-//      setState(() {
-//        isLoading = true;
-//      });
-//      uploadFile();
-//    }
-//  }
+  Future getImage() async {
+    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
 
+    if (imageFile != null) {
+      setState(() {
+        isLoading = true;
+      });
+      uploadFile();
+    }
+  }
   void getSticker() {
     // Hide keyboard when sticker appear
     focusNode.unfocus();
@@ -118,7 +117,6 @@ class ChatScreenState extends State<ChatScreen> {
       isShowSticker = !isShowSticker;
     });
   }
-
   Future uploadFile() async {
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
@@ -137,7 +135,6 @@ class ChatScreenState extends State<ChatScreen> {
       Fluttertoast.showToast(msg: 'This file is not an image');
     });
   }
-
   void onSendMessage(String content, int type) {
     // type: 0 = text, 1 = image, 2 = sticker
     if (content.trim() != '') {
@@ -537,9 +534,8 @@ class ChatScreenState extends State<ChatScreen> {
               margin: new EdgeInsets.symmetric(horizontal: 1.0),
               child: new IconButton(
                 icon: new Icon(Icons.image),
-                //onPressed: getImage,
+                onPressed: getImage,
                 color: primaryColor,
-                onPressed: () {},
               ),
             ),
             color: Colors.white,
