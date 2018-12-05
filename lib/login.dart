@@ -35,8 +35,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void validateAndSubmit(String type) async {
-//    User user = new User("","","","fuk5icTo2OM:APA91bHpXJwoaDlyQoowg42OLNwty8W1rUQmXXq5XHCEnpBFm2qVNS1k2mGb2ZuaR6081piYAhk0QYbbubng5qBv0G-ZsiYHiszDbnFz75louAfB93_GuQn5t8pnMLaU69mo0glA4MjD");
-//    LoginAPI.sendNotification(user);
+
     switch (type){
       case GGLOGIN:
         try {
@@ -189,17 +188,10 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.grey[300],
         body: new SingleChildScrollView(
           child: new Container(
-//                decoration: new BoxDecoration(
-//                  image: new DecorationImage(
-//                    image: new AssetImage("images/login_bg.jpg"),
-//                    fit: BoxFit.fill,
-//                  ),
-//                ),
               padding: const EdgeInsets.all(16.0),
               child: new Column(
                   children: [
                     new Card(
-
                         child: new Column(
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[

@@ -52,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final List<Widget> _children = [
       new ListUser(),
       new ChatList(),
-      new MyProfile(),
+      new ContactsDemo(user:widget.user),
     ];
     return Scaffold(
         bottomNavigationBar: BottomNavigationBar(
