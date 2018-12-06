@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "697669456586-q7mumhpddn5fj47pirq69cb8pvtrfonb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tddev.dttnkhtn",
+            "certificate_hash": "2bd096ef35ecbdccd740daad29bb6fab199c9545"
+          }
+        },
+        {
           "client_id": "697669456586-kf8525150crjj6ip7voo1qqrtiu7ni7c.apps.googleusercontent.com",
           "client_type": 3
         }
