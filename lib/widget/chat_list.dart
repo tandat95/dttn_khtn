@@ -169,7 +169,7 @@ class _ChatListState extends State<ChatList> {
                 color: Colors.white.withOpacity(0.8),
               )
                   : Container(),
-            )
+            ),
           ],
         ), onWillPop: () {},
       ),

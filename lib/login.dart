@@ -92,6 +92,7 @@ class _LoginPageState extends State<LoginPage> {
       _authHint = '';
     });
   }
+
   List<Widget> appLogo(){
     return [
       Image.asset(

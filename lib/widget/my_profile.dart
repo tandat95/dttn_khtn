@@ -4,57 +4,119 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dttn_khtn/common/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import'package:image_picker/image_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-class _GroupInfo extends StatelessWidget{
-  final String groupTitle;
-  final List<Widget> children;
-  const _GroupInfo({Key key,@required this.groupTitle, this.children}) : super(key: key);
+class _GroupInfo extends StatefulWidget {
+  const _GroupInfo({Key key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context) {
+  _GroupInfoState createState() => _GroupInfoState();
+}
+
+class _GroupInfoState extends State<_GroupInfo> {
+  String _userName;
+  String _phoneNumber;
+  String _email;
+  String _age;
+
+  String _lolName;
+  String _pupgName;
+  String _rosName;
+  String _fifaName;
+  String _sokName;
+
+  List<Widget> _UserInfoForm() {
+    return [
+      new TextFormField(
+        key: new Key('username'),
+        decoration: new InputDecoration(
+          labelText: 'Username',
+          suffixIcon: Icon(Icons.text_fields),
+        ),
+        autocorrect: false,
+        onSaved: (val) => _userName = val,
+      ),
+      new TextFormField(
+        key: new Key('email'),
+        decoration: new InputDecoration(
+          labelText: 'Email',
+          suffixIcon: Icon(Icons.email),
+        ),
+        autocorrect: false,
+        onSaved: (val) => _email = val,
+      ),
+    new TextFormField(
+        key: new Key('phone'),
+        decoration: new InputDecoration(
+          labelText: 'Phone number',
+          suffixIcon: Icon(Icons.phone),
+        ),
+        autocorrect: false,
+        onSaved: (val) => _phoneNumber = val,
+      ),
+     new TextFormField(
+        key: new Key('age'),
+        keyboardType: TextInputType.number,
+        decoration: new InputDecoration(
+          labelText: 'Age',
+          suffixIcon: Icon(Icons.cake),
+        ),
+        autocorrect: false,
+        onSaved: (val) => _age = val,
+      ),
+    ];
+  }
+
+  Widget cardContainer(String tittle, List<Widget> childs) {
     return Card(
+        margin: const EdgeInsets.all(16),
         child: new Column(
-            mainAxisSize: MainAxisSize.min,
+            //mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              new Container(
-                  padding: const EdgeInsets.all(16.0),
-                  child: new Form(
-                      //key: formKey,
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: ([
-                          Text(groupTitle,
-                            style: TextStyle(
-
-                            ),
-                          ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            //children: children,
-                          )
-                        ]),
-                      )
+          new Container(
+              margin: const EdgeInsets.all(16),
+              child: new Form(
+                  //key: formKey,
+                  child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: ([
+                  Text(
+                    tittle,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Column(
+                    children: childs,
                   )
-              ),
-            ])
-      );
+                ]),
+              ))),
+        ]));
   }
-}
-class _InfoField extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-
-    return null;
+    return Container(
+      child: Column(
+        children: <Widget>[
+          cardContainer("User info", _UserInfoForm()),
+        ],
+      ),
+    );
   }
 }
+
+Widget padded({Widget child}) {
+  return new Padding(
+    padding: EdgeInsets.symmetric(vertical:0.0),
+    child: child,
+  );
+}
+
 class _ContactCategory extends StatelessWidget {
-  const _ContactCategory({ Key key, this.icon, this.children }) : super(key: key);
+  const _ContactCategory({Key key, this.icon, this.children}) : super(key: key);
   final IconData icon;
   final List<Widget> children;
 
@@ -64,8 +126,7 @@ class _ContactCategory extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: themeData.dividerColor))
-      ),
+          border: Border(bottom: BorderSide(color: themeData.dividerColor))),
       child: DefaultTextStyle(
         style: Theme.of(context).textTheme.subhead,
         child: SafeArea(
@@ -77,8 +138,7 @@ class _ContactCategory extends StatelessWidget {
               Container(
                   padding: const EdgeInsets.symmetric(vertical: 24.0),
                   width: 72.0,
-                  child: Icon(icon, color: themeData.primaryColor)
-              ),
+                  child: Icon(icon, color: themeData.primaryColor)),
               Expanded(child: Column(children: children))
             ],
           ),
@@ -89,7 +149,7 @@ class _ContactCategory extends StatelessWidget {
 }
 
 class _ContactItem extends StatelessWidget {
-  _ContactItem({ Key key, this.icon, this.lines, this.tooltip, this.onPressed })
+  _ContactItem({Key key, this.icon, this.lines, this.tooltip, this.onPressed})
       : assert(lines.length > 1),
         super(key: key);
 
@@ -101,16 +161,17 @@ class _ContactItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
-    final List<Widget> columnChildren = lines.sublist(0, lines.length - 1).map<Widget>((String line) => Text(line)).toList();
+    final List<Widget> columnChildren = lines
+        .sublist(0, lines.length - 1)
+        .map<Widget>((String line) => Text(line))
+        .toList();
     columnChildren.add(Text(lines.last, style: themeData.textTheme.caption));
 
     final List<Widget> rowChildren = <Widget>[
       Expanded(
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: columnChildren
-          )
-      )
+              children: columnChildren))
     ];
     if (icon != null) {
       rowChildren.add(SizedBox(
@@ -118,18 +179,14 @@ class _ContactItem extends StatelessWidget {
           child: IconButton(
               icon: Icon(icon),
               color: themeData.primaryColor,
-              onPressed: onPressed
-          )
-      ));
+              onPressed: onPressed)));
     }
     return MergeSemantics(
       child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: rowChildren
-          )
-      ),
+              children: rowChildren)),
     );
   }
 }
@@ -139,8 +196,6 @@ class ContactsDemo extends StatefulWidget {
   final FirebaseUser user;
   static const String routeName = '/contacts';
 
-
-
   @override
   ContactsDemoState createState() => ContactsDemoState();
 }
@@ -148,7 +203,8 @@ class ContactsDemo extends StatefulWidget {
 enum AppBarBehavior { normal, pinned, floating, snapping }
 
 class ContactsDemoState extends State<ContactsDemo> {
-  static final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  static final GlobalKey<ScaffoldState> _scaffoldKey =
+      GlobalKey<ScaffoldState>();
   final double _appBarHeight = 256.0;
 
   File imageFile;
@@ -162,12 +218,13 @@ class ContactsDemoState extends State<ContactsDemo> {
     nickName = widget.user.displayName;
   }
 
-  Widget buildAvatar  (BuildContext context, DocumentSnapshot document) {
+  Widget buildAvatar(BuildContext context, DocumentSnapshot document) {
     return Image.network(
       document['photoUrl'],
       fit: BoxFit.cover,
     );
   }
+
   //get image from gallery
   Future getImage() async {
     imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
@@ -181,15 +238,22 @@ class ContactsDemoState extends State<ContactsDemo> {
 
   Future updateAvatar() async {
     //upload new avatar and get link download
-    StorageReference reference = FirebaseStorage.instance.ref().child(AVATAR_IMAGE_NAME);
+    StorageReference reference =
+        FirebaseStorage.instance.ref().child(AVATAR_IMAGE_NAME);
     StorageUploadTask uploadTask = reference.putFile(imageFile);
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
-    final QuerySnapshot result = await Firestore.instance.collection('users').where('id', isEqualTo: widget.user.uid).getDocuments();
+    final QuerySnapshot result = await Firestore.instance
+        .collection('users')
+        .where('id', isEqualTo: widget.user.uid)
+        .getDocuments();
     storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
       //update photoUrl
       final List<DocumentSnapshot> documents = result.documents;
-      Firestore.instance.collection('users').document(widget.user.uid).updateData({
-        'photoUrl':downloadUrl,
+      Firestore.instance
+          .collection('users')
+          .document(widget.user.uid)
+          .updateData({
+        'photoUrl': downloadUrl,
       });
       setState(() {
         isLoading = false;
@@ -206,11 +270,12 @@ class ContactsDemoState extends State<ContactsDemo> {
     return Positioned(
       child: isLoading
           ? Container(
-        child: Center(
-          child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
-        ),
-        color: Colors.white.withOpacity(0.8),
-      )
+              child: Center(
+                child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+              ),
+              color: Colors.white.withOpacity(0.8),
+            )
           : Container(),
     );
   }
@@ -222,7 +287,7 @@ class ContactsDemoState extends State<ContactsDemo> {
     return Theme(
       data: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.indigo,
+        primarySwatch: Colors.blueGrey,
         platform: Theme.of(context).platform,
       ),
       child: Scaffold(
@@ -232,7 +297,8 @@ class ContactsDemoState extends State<ContactsDemo> {
             SliverAppBar(
               expandedHeight: _appBarHeight,
               pinned: _appBarBehavior == AppBarBehavior.pinned,
-              floating: _appBarBehavior == AppBarBehavior.floating || _appBarBehavior == AppBarBehavior.snapping,
+              floating: _appBarBehavior == AppBarBehavior.floating ||
+                  _appBarBehavior == AppBarBehavior.snapping,
               snap: _appBarBehavior == AppBarBehavior.snapping,
               actions: <Widget>[
                 IconButton(
@@ -251,24 +317,21 @@ class ContactsDemoState extends State<ContactsDemo> {
                       _appBarBehavior = value;
                     });
                   },
-                  itemBuilder: (BuildContext context) => <PopupMenuItem<AppBarBehavior>>[
-                    const PopupMenuItem<AppBarBehavior>(
-                        value: AppBarBehavior.normal,
-                        child: Text('App bar scrolls away')
-                    ),
-                    const PopupMenuItem<AppBarBehavior>(
-                        value: AppBarBehavior.pinned,
-                        child: Text('App bar stays put')
-                    ),
-                    const PopupMenuItem<AppBarBehavior>(
-                        value: AppBarBehavior.floating,
-                        child: Text('App bar floats')
-                    ),
-                    const PopupMenuItem<AppBarBehavior>(
-                        value: AppBarBehavior.snapping,
-                        child: Text('App bar snaps')
-                    ),
-                  ],
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuItem<AppBarBehavior>>[
+                        const PopupMenuItem<AppBarBehavior>(
+                            value: AppBarBehavior.normal,
+                            child: Text('App bar scrolls away')),
+                        const PopupMenuItem<AppBarBehavior>(
+                            value: AppBarBehavior.pinned,
+                            child: Text('App bar stays put')),
+                        const PopupMenuItem<AppBarBehavior>(
+                            value: AppBarBehavior.floating,
+                            child: Text('App bar floats')),
+                        const PopupMenuItem<AppBarBehavior>(
+                            value: AppBarBehavior.snapping,
+                            child: Text('App bar snaps')),
+                      ],
                 ),
               ],
               flexibleSpace: FlexibleSpaceBar(
@@ -276,43 +339,47 @@ class ContactsDemoState extends State<ContactsDemo> {
                 background: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[
-                      StreamBuilder(
-                        stream: Firestore.instance.collection('users').where('id', isEqualTo:widget.user.uid).snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Center(
-                              child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                              ),
-                            );
-                          } else {
-                            return buildAvatar(context, snapshot.data.documents[0]);
-                          }
-                        },
-                      ),
-                      // This gradient ensures that the toolbar icons are distinct
-                      // against the background image.
-                      const DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment(0.0, -1.0),
-                            end: Alignment(0.0, -0.4),
-                            colors: <Color>[Color(0x60000000), Color(0x00000000)],
-                          ),
+                    StreamBuilder(
+                      stream: Firestore.instance
+                          .collection('users')
+                          .where('id', isEqualTo: widget.user.uid)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(themeColor),
+                            ),
+                          );
+                        } else {
+                          return buildAvatar(context, snapshot.data.documents[0]);
+                        }
+                      },
+                    ),
+                    // This gradient ensures that the toolbar icons are distinct
+                    // against the background image.
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment(0.0, -1.0),
+                          end: Alignment(0.0, -0.4),
+                          colors: <Color>[Color(0x60000000), Color(0x00000000)],
                         ),
                       ),
-                      buildLoading()
+                    ),
+                    buildLoading()
                   ],
                 ),
               ),
             ),
             SliverList(
               delegate: SliverChildListDelegate(<Widget>[
-                AnnotatedRegion<SystemUiOverlayStyle>(
-                  value: SystemUiOverlayStyle.dark,
-                  child: _GroupInfo(groupTitle: "User info"),
-                ),
-                _GroupInfo(groupTitle: "Game",)
+                _GroupInfo()
+//                AnnotatedRegion<SystemUiOverlayStyle>(
+//                  value: SystemUiOverlayStyle.dark,
+//                  child: _GroupInfo(),
+//                ),
               ]),
             ),
           ],
@@ -321,9 +388,6 @@ class ContactsDemoState extends State<ContactsDemo> {
     );
   }
 }
-
-
-
 
 //import 'package:flutter/material.dart';
 //import 'package:dttn_khtn/common/constants.dart';

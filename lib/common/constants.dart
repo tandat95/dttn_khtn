@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
 
 const HORIZONTAL = 0;
 const VERTICAL = 1;
@@ -16,7 +17,9 @@ const AVATAR_IMAGE_NAME = 'avatarImage';
 const GGLOGIN ='googleLogin';
 const EMAILLOGIN ='emailLogin';
 const EMAILREG = 'emailReg';
-final themeColor = new Color(0xfff5a623);
-final primaryColor = Color(0xff203152);
+//final themeColor = new Color(0xfff5a623);
+//final primaryColor = Color(0xff203152);
 final greyColor = new Color(0xffaeaeae);
 final greyColor2 = new Color(0xffE8E8E8);
+final MaterialColor primaryColor = Colors.blueGrey;
+final MaterialColor themeColor = Colors.blueGrey;
