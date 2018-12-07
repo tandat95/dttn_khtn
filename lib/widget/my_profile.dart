@@ -7,27 +7,26 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:async';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:dttn_khtn/model/user.dart';
 
 class _GroupInfo extends StatefulWidget {
-  const _GroupInfo({Key key}) : super(key: key);
+  const _GroupInfo({Key key, @required this.user})
+      : super(key: key);
+  final User user;
 
   @override
   _GroupInfoState createState() => _GroupInfoState();
 }
 
 class _GroupInfoState extends State<_GroupInfo> {
-  String _userName;
-  String _phoneNumber;
-  String _email;
-  String _age;
 
-  String _lolName;
-  String _pupgName;
-  String _rosName;
-  String _fifaName;
-  String _sokName;
+  static final formKey = new GlobalKey<FormState>();
+  MyProfileState parentWidget;
+
+  List<String> _genders = <String>['', 'Male', 'Female'];
+  String _genderVal = '';
+
 
   List<Widget> _UserInfoForm() {
     return [
@@ -35,38 +34,74 @@ class _GroupInfoState extends State<_GroupInfo> {
         key: new Key('username'),
         decoration: new InputDecoration(
           labelText: 'Username',
-          suffixIcon: Icon(Icons.text_fields),
+          icon: Icon(Icons.text_fields),
         ),
+        initialValue: widget.user.userName,
         autocorrect: false,
-        onSaved: (val) => _userName = val,
+        onSaved: (val) => widget.user.userName = val,
       ),
       new TextFormField(
         key: new Key('email'),
         decoration: new InputDecoration(
           labelText: 'Email',
-          suffixIcon: Icon(Icons.email),
+          icon: Icon(Icons.email),
         ),
+        initialValue: widget.user.email,
         autocorrect: false,
-        onSaved: (val) => _email = val,
+        onSaved: (val) => widget.user.email = val,
       ),
-    new TextFormField(
+      new TextFormField(
         key: new Key('phone'),
+        keyboardType: TextInputType.number,
+        initialValue: widget.user.phoneNumber,
         decoration: new InputDecoration(
           labelText: 'Phone number',
-          suffixIcon: Icon(Icons.phone),
+          icon: Icon(Icons.phone),
         ),
         autocorrect: false,
-        onSaved: (val) => _phoneNumber = val,
+        onSaved: (val) => widget.user.phoneNumber = val,
       ),
-     new TextFormField(
+      new TextFormField(
         key: new Key('age'),
         keyboardType: TextInputType.number,
+        initialValue: widget.user.age,
         decoration: new InputDecoration(
           labelText: 'Age',
-          suffixIcon: Icon(Icons.cake),
+          icon: Icon(Icons.cake),
         ),
         autocorrect: false,
-        onSaved: (val) => _age = val,
+        onSaved: (val) => widget.user.age = val,
+      ),
+      new FormField(
+        builder: (FormFieldState state) {
+          return InputDecorator(
+            decoration: InputDecoration(
+              icon: const Icon(Icons.people),
+              labelText: 'Gender',
+            ),
+            isEmpty: _genderVal == '',
+            //isFocused: true,
+            child: new DropdownButtonHideUnderline(
+              child: new DropdownButton(
+                value: widget.user.gender,
+                isDense: true,
+                onChanged: (String newValue) {
+                  setState(() {
+                    _genderVal = newValue;
+                    widget.user.gender = newValue;
+                    state.didChange(newValue);
+                  });
+                },
+                items: _genders.map((String value) {
+                  return new DropdownMenuItem(
+                    value: value,
+                    child: new Text(value),
+                  );
+                }).toList(),
+              ),
+            ),
+          );
+        },
       ),
     ];
   }
@@ -77,85 +112,132 @@ class _GroupInfoState extends State<_GroupInfo> {
         key: new Key('lolname'),
         decoration: new InputDecoration(
           labelText: 'Nick "LOL"',
-          suffixIcon: Icon(Icons.games),
+          icon: Icon(Icons.games),
         ),
         autocorrect: false,
-        onSaved: (val) => _lolName = val,
+        initialValue: widget.user.lolName,
+        onSaved: (val) => widget.user.lolName = val,
       ),
       new TextFormField(
         key: new Key('pupgname'),
+        initialValue: widget.user.pupgName,
         decoration: new InputDecoration(
           labelText: 'Nick "PUPG"',
-          suffixIcon: Icon(Icons.games),
+          icon: Icon(Icons.games),
         ),
         autocorrect: false,
-        onSaved: (val) => _pupgName = val,
+        onSaved: (val) => widget.user.pupgName = val,
       ),
       new TextFormField(
-        key: new Key('phone'),
+        key: new Key('rosname'),
+        initialValue: widget.user.rosName,
         decoration: new InputDecoration(
           labelText: 'Nick "Rules Of Survival"',
-          suffixIcon: Icon(Icons.games),
+          icon: Icon(Icons.games),
         ),
         autocorrect: false,
-        onSaved: (val) => _rosName = val,
+        onSaved: (val) => widget.user.rosName = val,
       ),
       new TextFormField(
-        key: new Key('age'),
+        key: new Key('sokname'),
+        initialValue: widget.user.sokName,
         keyboardType: TextInputType.number,
         decoration: new InputDecoration(
           labelText: 'Nick "Strike of Kings (LQMB)"',
-          suffixIcon: Icon(Icons.games),
+          icon: Icon(Icons.games),
         ),
         autocorrect: false,
-        onSaved: (val) => _sokName = val,
+        onSaved: (val) => widget.user.sokName = val,
       ),
       new TextFormField(
-        key: new Key('age'),
+        key: new Key('fifaname'),
+        initialValue: widget.user.fifaName,
         keyboardType: TextInputType.number,
         decoration: new InputDecoration(
           labelText: 'Nick "Fifa online"',
-          suffixIcon: Icon(Icons.games),
+          icon: Icon(Icons.games),
         ),
         autocorrect: false,
-        onSaved: (val) => _fifaName = val,
+        onSaved: (val) => widget.user.fifaName = val,
       )
     ];
   }
 
-  Widget cardContainer(String tittle, List<Widget> childs) {
+  Widget cardContainer(IconData groupIcon, String tittle, List<Widget> childs) {
     return Card(
         margin: const EdgeInsets.all(16),
         child: new Column(
             //mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-          new Container(
-              margin: const EdgeInsets.all(16),
-              child: new Form(
-                  //key: formKey,
-                  child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: ([
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    groupIcon,
+                    color: Colors.blueGrey,
+                  ),
                   Text(
                     tittle,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  Column(
+                ],
+              ),
+              new Container(
+                  margin: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: childs,
-                  )
-                ]),
-              ))),
-        ]));
+                  )),
+            ]));
+  }
+
+  void onUpdate() async {
+    var form = formKey.currentState;
+    form.save();
+    await Firestore.instance
+        .collection('users')
+        .document(widget.user.id)
+        .updateData({
+      'nickName': widget.user.userName,
+      'lolName': widget.user.lolName,
+      'gender': widget.user.gender,
+      'phoneNumber': widget.user.phoneNumber,
+      'email': widget.user.email,
+      'age': widget.user.age,
+      'pupgName': widget.user.pupgName,
+      'rosName': widget.user.rosName,
+      'fifaName': widget.user.fifaName,
+      'sokName': widget.user.sokName,
+    });
+//    parentWidget.initState();
+//    parentWidget.setState(() {
+//      parentWidget.nickName = _userName;
+//    });
+    final snackBar = SnackBar(content: Text('Update successfully!'));
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Column(
-        children: <Widget>[
-          cardContainer("User info", _UserInfoForm()),
-          cardContainer("Game info", _GameInfoForm()),
-        ],
+      child: Form(
+        key: formKey,
+        child: Column(
+          children: <Widget>[
+            cardContainer(Icons.person, "User info", _UserInfoForm()),
+            cardContainer(Icons.videogame_asset, "Game info", _GameInfoForm()),
+            MaterialButton(
+              onPressed: onUpdate,
+              color: Colors.teal,
+              child: Text(
+                "Update",
+                style: TextStyle(color: Colors.white),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -163,7 +245,7 @@ class _GroupInfoState extends State<_GroupInfo> {
 
 Widget padded({Widget child}) {
   return new Padding(
-    padding: EdgeInsets.symmetric(vertical:0.0),
+    padding: EdgeInsets.symmetric(vertical: 0.0),
     child: child,
   );
 }
@@ -244,36 +326,51 @@ class _ContactItem extends StatelessWidget {
   }
 }
 
-class ContactsDemo extends StatefulWidget {
-  const ContactsDemo({Key key, this.user}) : super(key: key);
+class MyProfile extends StatefulWidget {
+  const MyProfile({Key key, this.user}) : super(key: key);
   final FirebaseUser user;
   static const String routeName = '/contacts';
 
   @override
-  ContactsDemoState createState() => ContactsDemoState();
+  MyProfileState createState() => MyProfileState();
 }
 
 enum AppBarBehavior { normal, pinned, floating, snapping }
 
-class ContactsDemoState extends State<ContactsDemo> {
+class MyProfileState extends State<MyProfile> {
   static final GlobalKey<ScaffoldState> _scaffoldKey =
       GlobalKey<ScaffoldState>();
   final double _appBarHeight = 256.0;
 
   File imageFile;
   bool isLoading;
-  String nickName;
+  User _userInfo = new User(); //model/user.dart
 
   @override
   void initState() {
     super.initState();
     isLoading = false;
-    nickName = widget.user.displayName;
+    _userInfo.id = widget.user.uid;
   }
 
   Widget buildAvatar(BuildContext context, DocumentSnapshot document) {
-    return Image.network(
-      document['photoUrl'],
+    return CachedNetworkImage(
+      placeholder: Container(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+        ),
+        decoration: BoxDecoration(
+          color: greyColor2,
+        ),
+      ),
+      errorWidget: Material(
+        child: Image.asset(
+          'images/avatar_empty.png',
+          fit: BoxFit.cover,
+        ),
+        clipBehavior: Clip.hardEdge,
+      ),
+      imageUrl: document['photoUrl'],
       fit: BoxFit.cover,
     );
   }
@@ -291,8 +388,9 @@ class ContactsDemoState extends State<ContactsDemo> {
 
   Future updateAvatar() async {
     //upload new avatar and get link download
-    StorageReference reference =
-        FirebaseStorage.instance.ref().child(AVATAR_IMAGE_NAME);
+    StorageReference reference = FirebaseStorage.instance
+        .ref()
+        .child(AVATAR_BASE_NAME + widget.user.uid);
     StorageUploadTask uploadTask = reference.putFile(imageFile);
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
     final QuerySnapshot result = await Firestore.instance
@@ -388,7 +486,19 @@ class ContactsDemoState extends State<ContactsDemo> {
                 ),
               ],
               flexibleSpace: FlexibleSpaceBar(
-                title: Text(nickName),
+                title: StreamBuilder(
+                  stream: Firestore.instance
+                      .collection('users')
+                      .where('id', isEqualTo: widget.user.uid)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Text(" ");
+                    } else {
+                      return Text(snapshot.data.documents[0]['nickName']);
+                    }
+                  },
+                ),
                 background: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[
@@ -406,7 +516,8 @@ class ContactsDemoState extends State<ContactsDemo> {
                             ),
                           );
                         } else {
-                          return buildAvatar(context, snapshot.data.documents[0]);
+                          return buildAvatar(
+                              context, snapshot.data.documents[0]);
                         }
                       },
                     ),
@@ -428,11 +539,35 @@ class ContactsDemoState extends State<ContactsDemo> {
             ),
             SliverList(
               delegate: SliverChildListDelegate(<Widget>[
-                _GroupInfo()
-//                AnnotatedRegion<SystemUiOverlayStyle>(
-//                  value: SystemUiOverlayStyle.dark,
-//                  child: _GroupInfo(),
-//                ),
+                StreamBuilder(
+                  stream: Firestore.instance
+                      .collection('users')
+                      .where('id', isEqualTo: widget.user.uid)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                          AlwaysStoppedAnimation<Color>(themeColor),
+                        ),
+                      );
+                    } else {
+                      var data = snapshot.data.documents[0];
+                      _userInfo.lolName = data['lolName'];
+                      _userInfo.sokName = data['sokName'];
+                      _userInfo.fifaName = data['fifaName'];
+                      _userInfo.rosName = data['rosName'];
+                      _userInfo.pupgName = data['pupgName'];
+                      _userInfo.age = data['age'];
+                      _userInfo.email = data['email'];
+                      _userInfo.phoneNumber = data['phoneNumber'];
+                      _userInfo.gender = data['gender'];
+                      _userInfo.userName = data['nickName'];
+                      return _GroupInfo(user: _userInfo);
+                    }
+                  },
+                ),
               ]),
             ),
           ],

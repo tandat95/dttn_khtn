@@ -1,4 +1,5 @@
-class User{
-  String id, name, photoUrl, pushId;
-  User(this.id, this.name, this.photoUrl, this.pushId);
+class User {
+  String id, photoUrl, pushId, userName, phoneNumber, email, age, gender,
+      lolName, pupgName, rosName, fifaName, sokName;
 }
+

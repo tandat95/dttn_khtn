@@ -6,6 +6,7 @@ import 'package:dttn_khtn/common/constants.dart';
 
 class Choice {
   const Choice({this.title, this.icon, this.isPaid});
+
   final String title;
   final bool isPaid;
   final IconData icon;
@@ -13,6 +14,7 @@ class Choice {
 
 class ListUser extends StatelessWidget {
   bool isLoading = false;
+
   ListUser();
 
   @override
@@ -20,18 +22,42 @@ class ListUser extends StatelessWidget {
     return DefaultTabController(
       length: choices.length,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('List player'),
-          bottom: TabBar(
-            isScrollable: true,
-            tabs: choices.map((Choice choice) {
-              return Tab(
-                text: choice.title,
-                //icon: Icon(choice.icon),
-              );
-            }).toList(),
+        appBar: new PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: new Container(
+            color: Colors.blueGrey,
+            child: new SafeArea(
+              child: Column(
+                children: <Widget>[
+                  new Expanded(child: new Container()),
+                  TabBar(
+                    isScrollable: true,
+                    tabs: choices.map((Choice choice) {
+                      return Tab(
+                        text: choice.title,
+                        //icon: Icon(choice.icon),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
+
+//        appBar: AppBar(
+//
+//          //title: const Text('List player'),
+//          bottom: TabBar(
+//            isScrollable: true,
+//            tabs: choices.map((Choice choice) {
+//              return Tab(
+//                text: choice.title,
+//                //icon: Icon(choice.icon),
+//              );
+//            }).toList(),
+//          ),
+//        ),
         body: TabBarView(
           children: choices.map((Choice choice) {
             return Padding(
@@ -53,11 +79,11 @@ const List<Choice> choices = const <Choice>[
   const Choice(title: 'Paid player', isPaid: true),
 ];
 
-
 class ChoiceCard extends StatelessWidget {
   const ChoiceCard({Key key, this.choice}) : super(key: key);
   final Choice choice;
   final bool isLoading = false;
+
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
     return Container(
       child: FlatButton(
@@ -114,14 +140,14 @@ class ChoiceCard extends StatelessWidget {
               context,
               new MaterialPageRoute(
                   builder: (context) => new Chat(
-                    peerId: document.documentID,
-                    peerAvatar: document['photoUrl'],
-                  )));
+                        peerId: document.documentID,
+                        peerAvatar: document['photoUrl'],
+                      )));
         },
         color: greyColor2,
         padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
         shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       ),
       margin: EdgeInsets.only(bottom: 3.0, left: 3.0, right: 3.0),
     );
@@ -160,17 +186,18 @@ class ChoiceCard extends StatelessWidget {
           Positioned(
             child: isLoading
                 ? Container(
-              child: Center(
-                child: CircularProgressIndicator(
-                    valueColor:
-                    AlwaysStoppedAnimation<Color>(themeColor)),
-              ),
-              color: Colors.white.withOpacity(0.8),
-            )
+                    child: Center(
+                      child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(themeColor)),
+                    ),
+                    color: Colors.white.withOpacity(0.8),
+                  )
                 : Container(),
           )
         ],
-      ), onWillPop: () {},
+      ),
+      onWillPop: () {},
     );
   }
 }

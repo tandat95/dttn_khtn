@@ -53,8 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final List<Widget> _children = [
       new ListUser(),
       new ChatList(),
-      new ContactsDemo(user: widget.user),
-      new ContactsDemo(user: widget.user),
+      new MyProfile(user: widget.user),
+      new MyProfile(user: widget.user),
     ];
     return Scaffold(
       resizeToAvoidBottomPadding: false,

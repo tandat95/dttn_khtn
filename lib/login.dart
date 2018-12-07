@@ -3,7 +3,6 @@ import 'primary_button.dart';
 import 'package:dttn_khtn/loginAPI.dart';
 import 'common/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'model/user.dart';
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title, this.onSignIn}) : super(key: key);
   final String title;

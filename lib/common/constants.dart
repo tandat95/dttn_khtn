@@ -12,7 +12,7 @@ const USERS = 'users';
 const USER_ID = 'userId';
 const USER_NAME = 'userName';
 const USER_LIST = 'userList';
-const AVATAR_IMAGE_NAME = 'avatarImage';
+const AVATAR_BASE_NAME = 'avatarImage';
 
 const GGLOGIN ='googleLogin';
 const EMAILLOGIN ='emailLogin';
