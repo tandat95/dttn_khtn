@@ -71,6 +71,58 @@ class _GroupInfoState extends State<_GroupInfo> {
     ];
   }
 
+  List<Widget> _GameInfoForm() {
+    return [
+      new TextFormField(
+        key: new Key('lolname'),
+        decoration: new InputDecoration(
+          labelText: 'Nick "LOL"',
+          suffixIcon: Icon(Icons.games),
+        ),
+        autocorrect: false,
+        onSaved: (val) => _lolName = val,
+      ),
+      new TextFormField(
+        key: new Key('pupgname'),
+        decoration: new InputDecoration(
+          labelText: 'Nick "PUPG"',
+          suffixIcon: Icon(Icons.games),
+        ),
+        autocorrect: false,
+        onSaved: (val) => _pupgName = val,
+      ),
+      new TextFormField(
+        key: new Key('phone'),
+        decoration: new InputDecoration(
+          labelText: 'Nick "Rules Of Survival"',
+          suffixIcon: Icon(Icons.games),
+        ),
+        autocorrect: false,
+        onSaved: (val) => _rosName = val,
+      ),
+      new TextFormField(
+        key: new Key('age'),
+        keyboardType: TextInputType.number,
+        decoration: new InputDecoration(
+          labelText: 'Nick "Strike of Kings (LQMB)"',
+          suffixIcon: Icon(Icons.games),
+        ),
+        autocorrect: false,
+        onSaved: (val) => _sokName = val,
+      ),
+      new TextFormField(
+        key: new Key('age'),
+        keyboardType: TextInputType.number,
+        decoration: new InputDecoration(
+          labelText: 'Nick "Fifa online"',
+          suffixIcon: Icon(Icons.games),
+        ),
+        autocorrect: false,
+        onSaved: (val) => _fifaName = val,
+      )
+    ];
+  }
+
   Widget cardContainer(String tittle, List<Widget> childs) {
     return Card(
         margin: const EdgeInsets.all(16),
@@ -102,6 +154,7 @@ class _GroupInfoState extends State<_GroupInfo> {
       child: Column(
         children: <Widget>[
           cardContainer("User info", _UserInfoForm()),
+          cardContainer("Game info", _GameInfoForm()),
         ],
       ),
     );
