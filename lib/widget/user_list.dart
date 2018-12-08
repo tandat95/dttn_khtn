@@ -84,6 +84,41 @@ class ChoiceCard extends StatelessWidget {
   final Choice choice;
   final bool isLoading = false;
 
+  Widget loadGenderIcon(DocumentSnapshot document) {
+    String strGender = document['gender'];
+    if (strGender == 'Male') {
+      return Image.asset("images/ic_male.png");
+    } else if (strGender == 'Female') {
+      return Image.asset("images/ic_female.png");
+    }
+  }
+
+  Widget buildGameInfo(DocumentSnapshot document) {
+    var allGames = <String>[
+      'lolName',
+      'pupgName',
+      'rosName',
+      'sokName',
+      'fifaName'
+    ];
+    var displayGame = <String>['LOL', 'PUPG', 'ROS', 'SOK (LQMB)', 'FIFA'];
+    var listGame = <String>[];
+    for (int i = 0; i < allGames.length; i++) {
+      if (document[allGames[i]] != null && document[allGames[i]] != '') {
+        listGame.add(displayGame[i]);
+      }
+    }
+    String strGame = listGame.join(', ');
+    return Container(
+      child: Text(
+        'Games: ${strGame ?? '--'}',
+        style: TextStyle(color: primaryColor),
+      ),
+      alignment: Alignment.centerLeft,
+      margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+    );
+  }
+
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
     return Container(
       child: FlatButton(
@@ -96,13 +131,13 @@ class ChoiceCard extends StatelessWidget {
                     strokeWidth: 1.0,
                     valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                   ),
-                  width: 50.0,
-                  height: 50.0,
+                  width: 60.0,
+                  height: 60.0,
                   padding: EdgeInsets.all(15.0),
                 ),
                 imageUrl: document['photoUrl'],
-                width: 50.0,
-                height: 50.0,
+                width: 60.0,
+                height: 60.0,
                 fit: BoxFit.cover,
               ),
               borderRadius: BorderRadius.all(Radius.circular(25.0)),
@@ -114,25 +149,30 @@ class ChoiceCard extends StatelessWidget {
                   children: <Widget>[
                     new Container(
                       child: Text(
-                        'Nickname: ${document['nickname']}',
-                        style: TextStyle(color: primaryColor),
+                        '${document['nickName']}',
+                        style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
                       ),
                       alignment: Alignment.centerLeft,
                       margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
                     ),
                     new Container(
                       child: Text(
-                        'About me: ${document['aboutMe'] ?? 'Not available'}',
+                        'About me: ${document['aboutMe'] ?? '--'}',
                         style: TextStyle(color: primaryColor),
                       ),
                       alignment: Alignment.centerLeft,
                       margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                    )
+                    ),
+                    buildGameInfo(document)
                   ],
                 ),
                 margin: EdgeInsets.only(left: 20.0),
               ),
             ),
+            loadGenderIcon(document),
           ],
         ),
         onPressed: () {
@@ -146,8 +186,7 @@ class ChoiceCard extends StatelessWidget {
         },
         color: greyColor2,
         padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        shape: RoundedRectangleBorder(),
       ),
       margin: EdgeInsets.only(bottom: 3.0, left: 3.0, right: 3.0),
     );

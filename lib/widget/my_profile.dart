@@ -9,6 +9,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:dttn_khtn/model/user.dart';
+import 'package:dttn_khtn/loginAPI.dart';
 
 class _GroupInfo extends StatefulWidget {
   const _GroupInfo({Key key, @required this.user})
@@ -346,13 +347,17 @@ class MyProfileState extends State<MyProfile> {
   bool isLoading;
   User _userInfo = new User(); //model/user.dart
 
-  @override
-  void initState() {
+  FirebaseUser firebaseUser;
+  initState()  {
     super.initState();
     isLoading = false;
-    _userInfo.id = widget.user.uid;
+     LoginAPI.currentUser().then((user) {
+      setState(() {
+        firebaseUser = user;
+        _userInfo.id = user.uid;
+      });
+    });
   }
-
   Widget buildAvatar(BuildContext context, DocumentSnapshot document) {
     return CachedNetworkImage(
       placeholder: Container(
@@ -390,19 +395,19 @@ class MyProfileState extends State<MyProfile> {
     //upload new avatar and get link download
     StorageReference reference = FirebaseStorage.instance
         .ref()
-        .child(AVATAR_BASE_NAME + widget.user.uid);
+        .child(AVATAR_BASE_NAME + firebaseUser.uid);
     StorageUploadTask uploadTask = reference.putFile(imageFile);
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
     final QuerySnapshot result = await Firestore.instance
         .collection('users')
-        .where('id', isEqualTo: widget.user.uid)
+        .where('id', isEqualTo: firebaseUser.uid)
         .getDocuments();
     storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
       //update photoUrl
       final List<DocumentSnapshot> documents = result.documents;
       Firestore.instance
           .collection('users')
-          .document(widget.user.uid)
+          .document(firebaseUser.uid)
           .updateData({
         'photoUrl': downloadUrl,
       });
@@ -435,6 +440,16 @@ class MyProfileState extends State<MyProfile> {
 
   @override
   Widget build(BuildContext context) {
+    if(firebaseUser == null){
+      return Container(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+        ),
+        decoration: BoxDecoration(
+          color: greyColor2,
+        ),
+      );
+    }
     return Theme(
       data: ThemeData(
         brightness: Brightness.light,
@@ -489,7 +504,7 @@ class MyProfileState extends State<MyProfile> {
                 title: StreamBuilder(
                   stream: Firestore.instance
                       .collection('users')
-                      .where('id', isEqualTo: widget.user.uid)
+                      .where('id', isEqualTo: firebaseUser.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
@@ -505,7 +520,7 @@ class MyProfileState extends State<MyProfile> {
                     StreamBuilder(
                       stream: Firestore.instance
                           .collection('users')
-                          .where('id', isEqualTo: widget.user.uid)
+                          .where('id', isEqualTo: firebaseUser.uid)
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
@@ -542,7 +557,7 @@ class MyProfileState extends State<MyProfile> {
                 StreamBuilder(
                   stream: Firestore.instance
                       .collection('users')
-                      .where('id', isEqualTo: widget.user.uid)
+                      .where('id', isEqualTo: firebaseUser.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
