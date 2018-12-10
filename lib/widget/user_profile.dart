@@ -23,84 +23,86 @@ import 'package:dttn_khtn/widget/chat.dart';
 //}
 
 class _GroupInfo extends StatelessWidget {
-  final User user;
-  final bool isMyProfile;
-  _GroupInfo({Key key, this.user, this.isMyProfile}) : super(key: key);
-
+  final DocumentSnapshot document;
+  _GroupInfo({Key key, this.document}) : super(key: key);
 
   static final formKey = new GlobalKey<FormState>();
+
   //MyProfileState parentWidget;
 
-  List<String> _genders = <String>['--','Male', 'Female'];
+  List<String> _genders = <String>['--', 'Male', 'Female'];
 
   String _genderVal = '';
+
+  User user (){
+    User _userInfo = new User();
+    _userInfo.lolName = document['lolName'];
+    _userInfo.sokName = document['sokName'];
+    _userInfo.fifaName = document['fifaName'];
+    _userInfo.rosName = document['rosName'];
+    _userInfo.pupgName = document['pupgName'];
+    _userInfo.age = document['age'];
+    _userInfo.email = document['email'];
+    _userInfo.phoneNumber = document['phoneNumber'];
+    _userInfo.gender = document['gender'];
+    _userInfo.userName = document['nickName'];
+   return _userInfo;
+  }
 
   List<Widget> _UserInfoForm() {
     return [
       new TextFormField(
-        enabled: isMyProfile,
+        enabled: false,
         key: new Key('username'),
         decoration: new InputDecoration(
           labelText: 'Username',
           icon: Icon(Icons.text_fields),
         ),
-        initialValue: user.userName,
+        initialValue: document['nickName'],
         autocorrect: false,
-        onSaved: (val) => user.userName = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
+        enabled: false,
         key: new Key('email'),
         decoration: new InputDecoration(
           labelText: 'Email',
           icon: Icon(Icons.email),
         ),
-        initialValue: user.email,
+        initialValue:document['email'],
         autocorrect: false,
-        onSaved: (val) => user.email = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
-        key: new Key('phone'),
+        enabled: false,
+        key: new Key('phoneNumber'),
         keyboardType: TextInputType.number,
-        initialValue: user.phoneNumber,
+        initialValue: document['phoneNumber'],
         decoration: new InputDecoration(
           labelText: 'Phone number',
           icon: Icon(Icons.phone),
         ),
         autocorrect: false,
-        onSaved: (val) => user.phoneNumber = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
+        enabled: false,
         key: new Key('age'),
         keyboardType: TextInputType.number,
-        initialValue: user.age,
+        initialValue: document['age'],
         decoration: new InputDecoration(
           labelText: 'Age',
           icon: Icon(Icons.cake),
         ),
         autocorrect: false,
-        onSaved: (val) =>user.age = val,
       ),
-      new DropdownButtonFormField(
-        decoration: InputDecoration(
-          icon: const Icon(Icons.people),
+      new TextFormField(
+        enabled: false,
+        key: new Key('Gender'),
+        keyboardType: TextInputType.number,
+        initialValue: document['gender'],
+        decoration: new InputDecoration(
           labelText: 'Gender',
+          icon: Icon(Icons.people),
         ),
-        value: user.gender,
-        onChanged: (String newValue) {
-            _genderVal = newValue;
-            user.gender = newValue;
-            //state.didChange(newValue);
-        },
-        items: _genders.map((String value) {
-          return new DropdownMenuItem(
-            value: value,
-            child: new Text(value),
-          );
-        }).toList(),
-        onSaved: (val) => user.gender  = val,
+        autocorrect: false,
       ),
     ];
   }
@@ -108,61 +110,56 @@ class _GroupInfo extends StatelessWidget {
   List<Widget> _GameInfoForm() {
     return [
       new TextFormField(
-        enabled: isMyProfile,
-        key: new Key('lolname'),
+        enabled: false,
+        key: new Key('lolName'),
         decoration: new InputDecoration(
           labelText: 'Nick "LOL"',
           icon: Icon(Icons.games),
         ),
         autocorrect: false,
-        initialValue: user.lolName,
-        onSaved: (val) =>user.lolName = val,
+        initialValue: document['lolName'],
       ),
       new TextFormField(
-        enabled: isMyProfile,
-        key: new Key('pupgname'),
-        initialValue: user.pupgName,
+        enabled: false,
+        key: new Key('pupgName'),
+        initialValue: document['pupgName'],
         decoration: new InputDecoration(
           labelText: 'Nick "PUPG"',
           icon: Icon(Icons.games),
         ),
         autocorrect: false,
-        onSaved: (val) => user.pupgName = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
-        key: new Key('rosname'),
-        initialValue: user.rosName,
+        enabled: false,
+        key: new Key('rosName'),
+        initialValue: document['rosName'],
         decoration: new InputDecoration(
           labelText: 'Nick "Rules Of Survival"',
           icon: Icon(Icons.games),
         ),
         autocorrect: false,
-        onSaved: (val) => user.rosName = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
-        key: new Key('sokname'),
-        initialValue:user.sokName,
+        enabled: false,
+        key: new Key('sokName'),
+        initialValue: document['sokName'],
         keyboardType: TextInputType.number,
         decoration: new InputDecoration(
           labelText: 'Nick "Strike of Kings (LQMB)"',
           icon: Icon(Icons.games),
         ),
         autocorrect: false,
-        onSaved: (val) => user.sokName = val,
       ),
       new TextFormField(
-        enabled:isMyProfile,
-        key: new Key('fifaname'),
-        initialValue: user.fifaName,
+        enabled: false,
+        key: new Key('fifaName'),
+        initialValue: document['fifaName'],
         keyboardType: TextInputType.number,
         decoration: new InputDecoration(
           labelText: 'Nick "Fifa online"',
           icon: Icon(Icons.games),
         ),
         autocorrect: false,
-        onSaved: (val) => user.fifaName = val,
       )
     ];
   }
@@ -197,28 +194,6 @@ class _GroupInfo extends StatelessWidget {
             ]));
   }
 
-  void doUpdate(BuildContext context) async {
-    var form = formKey.currentState;
-    form.save();
-    await Firestore.instance
-        .collection('users')
-        .document(user.id)
-        .updateData({
-      'nickName': user.userName,
-      'lolName': user.lolName,
-      'gender': user.gender,
-      'phoneNumber':user.phoneNumber,
-      'email': user.email,
-      'age': user.age,
-      'pupgName': user.pupgName,
-      'rosName': user.rosName,
-      'fifaName':user.fifaName,
-      'sokName': user.sokName,
-    });
-    final snackBar = SnackBar(content: Text('Update successfully!'));
-    Scaffold.of(context).showSnackBar(snackBar);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -242,19 +217,18 @@ Widget padded({Widget child}) {
   );
 }
 
-class MyProfile extends StatefulWidget {
-  const MyProfile({Key key, this.user, @required this.isMyProfile}) : super(key: key);
-  final FirebaseUser user;
-  final bool isMyProfile;
+class UserProfile extends StatefulWidget {
+  const UserProfile({Key key, this.document}) : super(key: key);
+  final DocumentSnapshot document;
   static const String routeName = '/contacts';
 
   @override
-  MyProfileState createState() => MyProfileState();
+  UserProfileState createState() => UserProfileState();
 }
 
 enum AppBarBehavior { normal, pinned, floating, snapping }
 
-class MyProfileState extends State<MyProfile> {
+class UserProfileState extends State<UserProfile> {
   static final GlobalKey<ScaffoldState> _scaffoldKey =
       GlobalKey<ScaffoldState>();
   final double _appBarHeight = 256.0;
@@ -262,18 +236,18 @@ class MyProfileState extends State<MyProfile> {
   File imageFile;
   bool isLoading;
   User _userInfo = new User(); //model/user.dart
-  FirebaseUser firebaseUser;
   _GroupInfo _groupInfo;
-  initState()  {
+
+  initState() {
     super.initState();
     isLoading = false;
-     LoginAPI.currentUser().then((user) {
+    LoginAPI.currentUser().then((user) {
       setState(() {
-        firebaseUser = user;
-        _userInfo.id = user.uid;
+        _userInfo.id = widget.document['id'];
       });
     });
   }
+
   Widget buildAvatar(BuildContext context, DocumentSnapshot document) {
     return CachedNetworkImage(
       placeholder: Container(
@@ -297,46 +271,6 @@ class MyProfileState extends State<MyProfile> {
   }
 
   //get image from gallery
-  Future getImage() async {
-    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
-    if (imageFile != null) {
-      setState(() {
-        isLoading = true;
-      });
-      updateAvatar();
-    }
-  }
-
-  Future updateAvatar() async {
-    //upload new avatar and get link download
-    StorageReference reference = FirebaseStorage.instance
-        .ref()
-        .child(AVATAR_BASE_NAME + firebaseUser.uid);
-    StorageUploadTask uploadTask = reference.putFile(imageFile);
-    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
-    final QuerySnapshot result = await Firestore.instance
-        .collection('users')
-        .where('id', isEqualTo: firebaseUser.uid)
-        .getDocuments();
-    storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-      //update photoUrl
-      final List<DocumentSnapshot> documents = result.documents;
-      Firestore.instance
-          .collection('users')
-          .document(firebaseUser.uid)
-          .updateData({
-        'photoUrl': downloadUrl,
-      });
-      setState(() {
-        isLoading = false;
-      });
-    }, onError: (err) {
-      setState(() {
-        isLoading = false;
-      });
-      //Fluttertoast.showToast(msg: 'This file is not an image');
-    });
-  }
 
   Widget buildLoading() {
     return Positioned(
@@ -352,15 +286,18 @@ class MyProfileState extends State<MyProfile> {
     );
   }
 
-  Widget buildFAB(bool isMyprofile){
-    IconData iconData = isMyprofile? Icons.save: Icons.message;
+  Widget buildFAB(bool isMyprofile) {
     return FloatingActionButton(
       onPressed: () {
-        if(isMyprofile){
-          if(_groupInfo!=null) _groupInfo.doUpdate(context);
-        }
+        Navigator.push(
+            context,
+            new MaterialPageRoute(
+                builder: (context) => new Chat(
+                      peerId: widget.document.documentID,
+                      peerAvatar: widget.document['photoUrl'],
+                    )));
       },
-      child: Icon(iconData),
+      child: Icon(Icons.message),
     );
   }
 
@@ -368,7 +305,7 @@ class MyProfileState extends State<MyProfile> {
 
   @override
   Widget build(BuildContext context) {
-    if(firebaseUser == null){
+    if (widget.document == null) {
       return Container(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(themeColor),
@@ -396,16 +333,6 @@ class MyProfileState extends State<MyProfile> {
                   _appBarBehavior == AppBarBehavior.snapping,
               snap: _appBarBehavior == AppBarBehavior.snapping,
               actions: <Widget>[
-                IconButton(
-                  icon: const Icon(Icons.create),
-                  tooltip: 'Edit',
-                  onPressed: () {
-                    getImage();
-//                    _scaffoldKey.currentState.showSnackBar(const SnackBar(
-//                        content: Text("Editing isn't supported in this screen.")
-//                    ));
-                  },
-                ),
                 PopupMenuButton<AppBarBehavior>(
                   onSelected: (AppBarBehavior value) {
                     setState(() {
@@ -430,43 +357,14 @@ class MyProfileState extends State<MyProfile> {
                 ),
               ],
               flexibleSpace: FlexibleSpaceBar(
-                title: StreamBuilder(
-                  stream: Firestore.instance
-                      .collection('users')
-                      .where('id', isEqualTo: firebaseUser.uid)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Text(" ");
-                    } else {
-                      return Text(snapshot.data.documents[0]['nickName']);
-                    }
-                  },
-                ),
+                title: Text(widget.document['nickName']) ,
                 background: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[
-                    StreamBuilder(
-                      stream: Firestore.instance
-                          .collection('users')
-                          .where('id', isEqualTo: firebaseUser.uid)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return Center(
-                            child: CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(themeColor),
-                            ),
-                          );
-                        } else {
-                          return buildAvatar(
-                              context, snapshot.data.documents[0]);
-                        }
-                      },
+                    CachedNetworkImage(
+                      imageUrl: widget.document['photoUrl'],
+                      fit: BoxFit.cover,
                     ),
-                    // This gradient ensures that the toolbar icons are distinct
-                    // against the background image.
                     const DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -482,40 +380,9 @@ class MyProfileState extends State<MyProfile> {
               ),
             ),
             SliverList(
-              delegate: SliverChildListDelegate(<Widget>[
-                StreamBuilder(
-                  stream: Firestore.instance
-                      .collection('users')
-                      .where('id', isEqualTo: firebaseUser.uid)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          valueColor:
-                          AlwaysStoppedAnimation<Color>(themeColor),
-                        ),
-                      );
-                    } else {
-                      var data = snapshot.data.documents[0];
-                      _userInfo.lolName = data['lolName'];
-                      _userInfo.sokName = data['sokName'];
-                      _userInfo.fifaName = data['fifaName'];
-                      _userInfo.rosName = data['rosName'];
-                      _userInfo.pupgName = data['pupgName'];
-                      _userInfo.age = data['age'];
-                      _userInfo.email = data['email'];
-                      _userInfo.phoneNumber = data['phoneNumber'];
-                      _userInfo.gender = data['gender'];
-                      _userInfo.userName = data['nickName'];
-                      _groupInfo = new _GroupInfo(user: _userInfo, isMyProfile: widget.isMyProfile,);
-                      return _groupInfo;
-                    }
-                  },
-                ),
-              ]),
+              delegate: SliverChildListDelegate(
+                  <Widget>[_GroupInfo(document: widget.document)]),
             ),
-
           ],
         ),
       ),

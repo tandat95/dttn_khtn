@@ -3,7 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dttn_khtn/widget/chat.dart';
 import 'package:dttn_khtn/common/constants.dart';
-
+import 'package:dttn_khtn/widget/user_profile.dart';
 class Choice {
   const Choice({this.title, this.icon, this.isPaid});
 
@@ -13,7 +13,7 @@ class Choice {
 }
 
 class ListUser extends StatelessWidget {
-  bool isLoading = false;
+  //bool isLoading = false;
 
   ListUser();
 
@@ -91,6 +91,7 @@ class ChoiceCard extends StatelessWidget {
     } else if (strGender == 'Female') {
       return Image.asset("images/ic_female.png");
     }
+    return null;
   }
 
   Widget buildGameInfo(DocumentSnapshot document) {
@@ -179,9 +180,8 @@ class ChoiceCard extends StatelessWidget {
           Navigator.push(
               context,
               new MaterialPageRoute(
-                  builder: (context) => new Chat(
-                        peerId: document.documentID,
-                        peerAvatar: document['photoUrl'],
+                  builder: (context) => new UserProfile(
+                        document: document ,
                       )));
         },
         color: greyColor2,

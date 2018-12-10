@@ -4,6 +4,7 @@ import 'package:dttn_khtn/widget/user_list.dart';
 import 'package:dttn_khtn/widget/chat_list.dart';
 import 'package:dttn_khtn/widget/my_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dttn_khtn/widget/user_profile.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title, this.user, this.onSignOut})
@@ -53,8 +54,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final List<Widget> _children = [
       new ListUser(),
       new ChatList(),
-      new MyProfile(user: widget.user),
-      new MyProfile(user: widget.user),
+      new MyProfile(user: widget.user, isMyProfile: false),
+      new MyProfile(user: widget.user, isMyProfile: true,),
     ];
     return Scaffold(
       resizeToAvoidBottomPadding: false,
