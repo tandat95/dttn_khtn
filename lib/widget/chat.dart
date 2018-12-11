@@ -23,9 +23,8 @@ class Chat extends StatelessWidget {
       appBar: new AppBar(
         title: new Text(
           'CHAT',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
         ),
-        centerTitle: true,
+        //centerTitle: true,
       ),
       body: new ChatScreen(
         peerId: peerId,
@@ -145,6 +144,28 @@ class ChatScreenState extends State<ChatScreen> {
           .document(groupChatId)
           .collection(groupChatId)
           .document(DateTime.now().millisecondsSinceEpoch.toString());
+
+      Firestore.instance
+          .collection('users')
+          .document(id)
+          .collection("user_messages")
+          .document(peerId).collection(peerId).document(DateTime.now().millisecondsSinceEpoch.toString());
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction.set(
+          Firestore.instance
+              .collection('users')
+              .document(id)
+              .collection("user_messages")
+              .document(peerId).collection(peerId).document(DateTime.now().millisecondsSinceEpoch.toString()),
+          {
+            'idFrom': id,
+            'idTo': peerId,
+            'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+            'content': content,
+            'type': type
+          },
+        );
+      });
 
       Firestore.instance.runTransaction((transaction) async {
         await transaction.set(

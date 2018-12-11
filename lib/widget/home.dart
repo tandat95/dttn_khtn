@@ -53,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //widget.user.uid
     final List<Widget> _children = [
       new ListUser(),
-      new ChatList(),
+      new ChatList(currentUserId: widget.user.uid,),
       new MyProfile(user: widget.user, isMyProfile: false),
       new MyProfile(user: widget.user, isMyProfile: true,),
     ];

@@ -7,9 +7,9 @@ import 'package:dttn_khtn/common/constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class ChatList extends StatefulWidget {
-  //final String currentUserId;
+  final String currentUserId;
 
-  //ChatList({Key key, @required this.currentUserId}) : super(key: key);
+  ChatList({Key key, @required this.currentUserId}) : super(key: key);
 
   @override
   State createState() => new _ChatListState();
@@ -55,8 +55,8 @@ class _ChatListState extends State<ChatList> {
                     children: <Widget>[
                       new Container(
                         child: Text(
-                          'Nickname: ${document['nickname']}',
-                          style: TextStyle(color: primaryColor),
+                         document['nickName'],
+                          style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         alignment: Alignment.centerLeft,
                         margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
@@ -88,7 +88,7 @@ class _ChatListState extends State<ChatList> {
           color: greyColor2,
           padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          RoundedRectangleBorder(),
         ),
         margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
       );
@@ -137,7 +137,7 @@ class _ChatListState extends State<ChatList> {
             // List
             Container(
               child: StreamBuilder(
-                stream: Firestore.instance.collection('users').snapshots(),
+                stream: Firestore.instance.collection('messages').snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Center(
@@ -147,7 +147,7 @@ class _ChatListState extends State<ChatList> {
                     );
                   } else {
                     return ListView.builder(
-                      padding: EdgeInsets.all(10.0),
+                      padding: EdgeInsets.all(5.0),
                       itemBuilder: (context, index) =>
                           buildItem(context, snapshot.data.documents[index]),
                       itemCount: snapshot.data.documents.length,

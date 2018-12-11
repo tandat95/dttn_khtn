@@ -91,7 +91,7 @@ class ChoiceCard extends StatelessWidget {
     } else if (strGender == 'Female') {
       return Image.asset("images/ic_female.png");
     }
-    return null;
+    return Text('--');
   }
 
   Widget buildGameInfo(DocumentSnapshot document) {
