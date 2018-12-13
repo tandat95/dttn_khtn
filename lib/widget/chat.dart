@@ -145,11 +145,20 @@ class ChatScreenState extends State<ChatScreen> {
           .collection(groupChatId)
           .document(DateTime.now().millisecondsSinceEpoch.toString());
 
-      Firestore.instance
-          .collection('users')
-          .document(id)
-          .collection("user_messages")
-          .document(peerId).collection(peerId).document(DateTime.now().millisecondsSinceEpoch.toString());
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction.set(
+          documentReference,
+          {
+            'idFrom': id,
+            'idTo': peerId,
+            'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+            'content': content,
+            'type': type
+          },
+        );
+      });
+
+
       Firestore.instance.runTransaction((transaction) async {
         await transaction.set(
           Firestore.instance
@@ -169,16 +178,22 @@ class ChatScreenState extends State<ChatScreen> {
 
       Firestore.instance.runTransaction((transaction) async {
         await transaction.set(
-          documentReference,
+          Firestore.instance
+              .collection('users')
+              .document(peerId)
+              .collection("user_messages")
+              .document(id).collection(id).document(DateTime.now().millisecondsSinceEpoch.toString()),
           {
-            'idFrom': id,
-            'idTo': peerId,
+            'idFrom': peerId,
+            'idTo': id,
             'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
             'content': content,
             'type': type
           },
         );
       });
+
+
       listScrollController.animateTo(0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     } else {
       Fluttertoast.showToast(msg: 'Nothing to send');
