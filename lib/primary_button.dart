@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:dttn_khtn/common/constants.dart';
 
-
-class PrimaryButton extends StatelessWidget {
+class PrimaryButton extends StatelessWidget { // ignore: must_be_immutable
   PrimaryButton({this.key, this.text, this.height, this.onPressed}) : super(key: key);
   Key key;
   String text;
@@ -16,7 +16,7 @@ class PrimaryButton extends StatelessWidget {
           child: new Text(text, style: new TextStyle(color: Colors.white, fontSize: 20.0)),
           shape: new RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(height / 2))),
-          color: Colors.blue,
+          color: themeColor,
           textColor: Colors.black87,
           onPressed: onPressed),
     );

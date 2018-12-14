@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'primary_button.dart';
 import 'package:dttn_khtn/loginAPI.dart';
-import 'common/constants.dart';
+import 'package:dttn_khtn/common/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title, this.onSignIn}) : super(key: key);
   final String title;
@@ -95,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
   List<Widget> appLogo(){
     return [
       Image.asset(
-        'images/logo_man_run.png',
+        'images/ic_game_money.png',
         height: 64.0,
         width: 64.0,
       ),
@@ -143,12 +144,21 @@ class _LoginPageState extends State<LoginPage> {
               child: new Text("Need an account? Register"),
               onPressed: moveToRegister
           ),
-          new PrimaryButton(
-              key: new Key('ggLogin'),
-              text: 'Login with Google',
-              height: 44.0,
-              onPressed:()=> validateAndSubmit(GGLOGIN)
+//          new PrimaryButton(
+//              key: new Key('ggLogin'),
+//              text: 'Login with Google',
+//              height: 44.0,
+//              onPressed:()=> validateAndSubmit(GGLOGIN)
+//          ),
+          Text('--or--', textAlign: TextAlign.center,),
+          SignInButton(
+            Buttons.Google,
+            onPressed:()=>  validateAndSubmit(GGLOGIN),
           ),
+          SignInButton(
+            Buttons.Facebook,
+            onPressed: () {},
+          )
         ];
       case FormType.register:
         return [

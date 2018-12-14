@@ -5,6 +5,7 @@ import 'package:dttn_khtn/widget/chat_list.dart';
 import 'package:dttn_khtn/widget/my_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dttn_khtn/common/constants.dart';
+import 'package:dttn_khtn/widget/make_money.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title, this.user, this.onSignOut})
@@ -57,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
       new ListUser(),
       new ChatList(currentUserId: widget.user.uid,),
       new MyProfile(user: widget.user),
-      new Container()
+      new MakeMoney()
     ];
     return Scaffold(
       resizeToAvoidBottomPadding: false,

@@ -133,7 +133,6 @@ class _GroupInfo extends StatelessWidget {
       new TextFormField(
         key: new Key('sokname'),
         initialValue: user.sokName,
-        keyboardType: TextInputType.number,
         decoration: new InputDecoration(
           labelText: 'Nick "Strike of Kings (LQMB)"',
           icon: Icon(Icons.games),
@@ -144,7 +143,6 @@ class _GroupInfo extends StatelessWidget {
       new TextFormField(
         key: new Key('fifaname'),
         initialValue: user.fifaName,
-        keyboardType: TextInputType.number,
         decoration: new InputDecoration(
           labelText: 'Nick "Fifa online"',
           icon: Icon(Icons.games),
