@@ -25,7 +25,7 @@ class ListUser extends StatelessWidget {
         appBar: new PreferredSize(
           preferredSize: Size.fromHeight(kToolbarHeight),
           child: new Container(
-            color: Colors.blueGrey,
+            color: themeColor,
             child: new SafeArea(
               child: Column(
                 children: <Widget>[
@@ -123,59 +123,66 @@ class ChoiceCard extends StatelessWidget {
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
     return Container(
       child: FlatButton(
-        child: Row(
+        child:
+        Column(
           children: <Widget>[
-            Material(
-              child: CachedNetworkImage(
-                placeholder: Container(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 1.0,
-                    valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+            Row(
+              children: <Widget>[
+                Material(
+                  child: CachedNetworkImage(
+                    placeholder: Container(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.0,
+                        valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                      ),
+                      width: 60.0,
+                      height: 60.0,
+                      padding: EdgeInsets.all(15.0),
+                    ),
+                    imageUrl: document['photoUrl'],
+                    width: 60.0,
+                    height: 60.0,
+                    fit: BoxFit.cover,
                   ),
-                  width: 60.0,
-                  height: 60.0,
-                  padding: EdgeInsets.all(15.0),
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  clipBehavior: Clip.hardEdge,
                 ),
-                imageUrl: document['photoUrl'],
-                width: 60.0,
-                height: 60.0,
-                fit: BoxFit.cover,
-              ),
-              borderRadius: BorderRadius.all(Radius.circular(25.0)),
-              clipBehavior: Clip.hardEdge,
-            ),
-            new Flexible(
-              child: Container(
-                child: new Column(
-                  children: <Widget>[
-                    new Container(
-                      child: Text(
-                        '${document['nickName']}',
-                        style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16),
-                      ),
-                      alignment: Alignment.centerLeft,
-                      margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                new Flexible(
+                  child: Container(
+                    child: new Column(
+                      children: <Widget>[
+                        new Container(
+                          child: Text(
+                            '${document['nickName']}',
+                            style: TextStyle(
+                                color: titleColorH2,
+                                //fontWeight: FontWeight.bold,
+                                fontSize: 16),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+                        ),
+                        new Container(
+                          child: Text(
+                            '${document['aboutMe'] ?? '--'}',
+                            style: TextStyle(color: subColor1),
+                          ),
+                          alignment: Alignment.centerLeft,
+                          margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+                        ),
+                        buildGameInfo(document)
+                      ],
                     ),
-                    new Container(
-                      child: Text(
-                        'About me: ${document['aboutMe'] ?? '--'}',
-                        style: TextStyle(color: primaryColor),
-                      ),
-                      alignment: Alignment.centerLeft,
-                      margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                    ),
-                    buildGameInfo(document)
-                  ],
+                    margin: EdgeInsets.only(left: 20.0),
+                  ),
                 ),
-                margin: EdgeInsets.only(left: 20.0),
-              ),
+                loadGenderIcon(document),
+              ],
             ),
-            loadGenderIcon(document),
+            Divider(height: 5,)
           ],
         ),
+
         onPressed: () {
           Navigator.push(
               context,
@@ -184,11 +191,11 @@ class ChoiceCard extends StatelessWidget {
                         document: document ,
                       )));
         },
-        color: greyColor2,
+        //color: subColor2,
         padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
         shape: RoundedRectangleBorder(),
       ),
-      margin: EdgeInsets.only(bottom: 3.0, left: 3.0, right: 3.0),
+     // margin: EdgeInsets.only(bottom: 3.0, left: 3.0, right: 3.0),
     );
   }
 

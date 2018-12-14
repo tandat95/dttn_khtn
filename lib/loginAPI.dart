@@ -74,7 +74,7 @@ class LoginAPI {
           if (documents.length == 0) {
           // Update data to server if new user
               Firestore.instance.collection('users').document(user.uid).setData(
-              {'nickname': user.displayName, 'photoUrl': user.photoUrl, 'id': user.uid});
+              {'nickName': user.displayName, 'photoUrl': user.photoUrl, 'id': user.uid});
           }
       }
       var token = await _firebaseMessaging.getToken();

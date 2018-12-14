@@ -4,7 +4,7 @@ import 'package:dttn_khtn/widget/user_list.dart';
 import 'package:dttn_khtn/widget/chat_list.dart';
 import 'package:dttn_khtn/widget/my_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:dttn_khtn/widget/user_profile.dart';
+import 'package:dttn_khtn/common/constants.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title, this.user, this.onSignOut})
@@ -18,12 +18,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _currentIndex = 0;
+  int _currentIndex;
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
 
   @override
   void initState() {
     super.initState();
+    _currentIndex = TAB_INDEX;
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) {
         print('on message $message');
@@ -45,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
+      TAB_INDEX = index;
     });
   }
 
@@ -54,21 +56,21 @@ class _MyHomePageState extends State<MyHomePage> {
     final List<Widget> _children = [
       new ListUser(),
       new ChatList(currentUserId: widget.user.uid,),
-      new MyProfile(user: widget.user, isMyProfile: false),
-      new MyProfile(user: widget.user, isMyProfile: true,),
+      new MyProfile(user: widget.user),
+      new Container()
     ];
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       bottomNavigationBar: Theme(
           data: Theme.of(context).copyWith(
             // sets the background color of the `BottomNavigationBar`
-              canvasColor: Colors.blueGrey,
+              canvasColor: themeColor,
               // sets the active color of the `BottomNavigationBar` if `Brightness` is light
               //primaryColor: Colors.red,
               textTheme: Theme
                   .of(context)
                   .textTheme
-                  .copyWith(caption: new TextStyle(color: Colors.white))),
+                  .copyWith(caption: new TextStyle(color: primaryColor))),
           child: BottomNavigationBar(
             onTap: onTabTapped,
             currentIndex: _currentIndex,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dttn_khtn/root_page.dart';
-
+import 'package:dttn_khtn/common/constants.dart';
 void main() => runApp(new MyApp());
 
 class MyApp extends StatelessWidget {
@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: 'Flutter Login',
       theme: new ThemeData(
-        primarySwatch: Colors.blueGrey,
+        primarySwatch: themeColor,
       ),
       home: new RootPage(),
     );

@@ -44,11 +44,16 @@ class _RootPageState extends State<RootPage> {
           onSignIn: () => _updateAuthStatus(AuthStatus.signedIn),
         );
       case AuthStatus.signedIn:
-        return new MyHomePage(
-          title: 'Home',
-          user: firebaseUser,
-          onSignOut: () => _updateAuthStatus(AuthStatus.notSignedIn),
-        );
+        return FutureBuilder(
+          future: LoginAPI.currentUser(),
+            builder: (context, snapshot) {
+          return snapshot.connectionState ==
+              ConnectionState.done
+              ? new MyHomePage(
+            title: 'Home', user: snapshot.data,onSignOut: () => _updateAuthStatus(AuthStatus.notSignedIn),
+          ):Container();
+        });
+
     }
   }
 }

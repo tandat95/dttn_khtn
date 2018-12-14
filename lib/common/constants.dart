@@ -17,9 +17,15 @@ const AVATAR_BASE_NAME = 'avatarImage';
 const GGLOGIN ='googleLogin';
 const EMAILLOGIN ='emailLogin';
 const EMAILREG = 'emailReg';
-//final themeColor = new Color(0xfff5a623);
-//final primaryColor = Color(0xff203152);
-final greyColor = new Color(0xffaeaeae);
-final greyColor2 = new Color(0xffE8E8E8);
-final MaterialColor primaryColor = Colors.blueGrey;
-final MaterialColor themeColor = Colors.blueGrey;
+
+int TAB_INDEX = 0;
+
+final MaterialColor primaryColor = Colors.deepOrange;
+final MaterialColor themeColor = Colors.deepOrange;
+
+final  subColor1 = new Color(0xffaeaeae);
+final  subColor2 = new Color(0xffE8E8E8);
+
+final titleColorH1 = new Color(0xFF333333);
+final titleColorH2 = new Color(0xFF333333);
+

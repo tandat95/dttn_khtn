@@ -24,21 +24,18 @@ import 'package:dttn_khtn/widget/chat.dart';
 
 class _GroupInfo extends StatelessWidget {
   final User user;
-  final bool isMyProfile;
-  _GroupInfo({Key key, this.user, this.isMyProfile}) : super(key: key);
 
+  _GroupInfo({Key key, this.user}) : super(key: key);
 
   static final formKey = new GlobalKey<FormState>();
+
   //MyProfileState parentWidget;
 
-  List<String> _genders = <String>['--','Male', 'Female'];
-
-  String _genderVal = '';
+  List<String> _genders = <String>['--', 'Male', 'Female'];
 
   List<Widget> _UserInfoForm() {
     return [
       new TextFormField(
-        enabled: isMyProfile,
         key: new Key('username'),
         decoration: new InputDecoration(
           labelText: 'Username',
@@ -49,7 +46,6 @@ class _GroupInfo extends StatelessWidget {
         onSaved: (val) => user.userName = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
         key: new Key('email'),
         decoration: new InputDecoration(
           labelText: 'Email',
@@ -60,7 +56,6 @@ class _GroupInfo extends StatelessWidget {
         onSaved: (val) => user.email = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
         key: new Key('phone'),
         keyboardType: TextInputType.number,
         initialValue: user.phoneNumber,
@@ -72,7 +67,6 @@ class _GroupInfo extends StatelessWidget {
         onSaved: (val) => user.phoneNumber = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
         key: new Key('age'),
         keyboardType: TextInputType.number,
         initialValue: user.age,
@@ -81,7 +75,7 @@ class _GroupInfo extends StatelessWidget {
           icon: Icon(Icons.cake),
         ),
         autocorrect: false,
-        onSaved: (val) =>user.age = val,
+        onSaved: (val) => user.age = val,
       ),
       new DropdownButtonFormField(
         decoration: InputDecoration(
@@ -90,9 +84,8 @@ class _GroupInfo extends StatelessWidget {
         ),
         value: user.gender,
         onChanged: (String newValue) {
-            _genderVal = newValue;
-            user.gender = newValue;
-            //state.didChange(newValue);
+          user.gender = newValue;
+          //state.didChange(newValue);
         },
         items: _genders.map((String value) {
           return new DropdownMenuItem(
@@ -100,7 +93,7 @@ class _GroupInfo extends StatelessWidget {
             child: new Text(value),
           );
         }).toList(),
-        onSaved: (val) => user.gender  = val,
+        onSaved: (val) => user.gender = val,
       ),
     ];
   }
@@ -108,7 +101,6 @@ class _GroupInfo extends StatelessWidget {
   List<Widget> _GameInfoForm() {
     return [
       new TextFormField(
-        enabled: isMyProfile,
         key: new Key('lolname'),
         decoration: new InputDecoration(
           labelText: 'Nick "LOL"',
@@ -116,10 +108,9 @@ class _GroupInfo extends StatelessWidget {
         ),
         autocorrect: false,
         initialValue: user.lolName,
-        onSaved: (val) =>user.lolName = val,
+        onSaved: (val) => user.lolName = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
         key: new Key('pupgname'),
         initialValue: user.pupgName,
         decoration: new InputDecoration(
@@ -130,7 +121,6 @@ class _GroupInfo extends StatelessWidget {
         onSaved: (val) => user.pupgName = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
         key: new Key('rosname'),
         initialValue: user.rosName,
         decoration: new InputDecoration(
@@ -141,9 +131,8 @@ class _GroupInfo extends StatelessWidget {
         onSaved: (val) => user.rosName = val,
       ),
       new TextFormField(
-        enabled: isMyProfile,
         key: new Key('sokname'),
-        initialValue:user.sokName,
+        initialValue: user.sokName,
         keyboardType: TextInputType.number,
         decoration: new InputDecoration(
           labelText: 'Nick "Strike of Kings (LQMB)"',
@@ -153,7 +142,6 @@ class _GroupInfo extends StatelessWidget {
         onSaved: (val) => user.sokName = val,
       ),
       new TextFormField(
-        enabled:isMyProfile,
         key: new Key('fifaname'),
         initialValue: user.fifaName,
         keyboardType: TextInputType.number,
@@ -171,25 +159,35 @@ class _GroupInfo extends StatelessWidget {
     return Card(
         margin: const EdgeInsets.all(16),
         child: new Column(
-            //mainAxisSize: MainAxisSize.min,
+          //mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    groupIcon,
-                    color: Colors.blueGrey,
+              Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    verticalDirection: VerticalDirection.down,
+                    children: <Widget>[
+                      Icon(
+                        groupIcon,
+                        color: themeColor,
+                        size: 20,
+                      ),
+                      Text(
+                        ' '+tittle,
+                        style: TextStyle(fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: titleColorH2),
+                      ),
+                    ],
                   ),
-                  Text(
-                    tittle,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
+                height: 30,
+                padding: EdgeInsets.all(10),
               ),
+
               new Container(
-                  margin: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(
+                      left: 16, right: 16, bottom: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: childs,
@@ -207,12 +205,12 @@ class _GroupInfo extends StatelessWidget {
       'nickName': user.userName,
       'lolName': user.lolName,
       'gender': user.gender,
-      'phoneNumber':user.phoneNumber,
+      'phoneNumber': user.phoneNumber,
       'email': user.email,
       'age': user.age,
       'pupgName': user.pupgName,
       'rosName': user.rosName,
-      'fifaName':user.fifaName,
+      'fifaName': user.fifaName,
       'sokName': user.sokName,
     });
     final snackBar = SnackBar(content: Text('Update successfully!'));
@@ -243,9 +241,9 @@ Widget padded({Widget child}) {
 }
 
 class MyProfile extends StatefulWidget {
-  const MyProfile({Key key, this.user, @required this.isMyProfile}) : super(key: key);
+  const MyProfile({Key key, this.user})
+      : super(key: key);
   final FirebaseUser user;
-  final bool isMyProfile;
   static const String routeName = '/contacts';
 
   @override
@@ -256,7 +254,7 @@ enum AppBarBehavior { normal, pinned, floating, snapping }
 
 class MyProfileState extends State<MyProfile> {
   static final GlobalKey<ScaffoldState> _scaffoldKey =
-      GlobalKey<ScaffoldState>();
+  GlobalKey<ScaffoldState>();
   final double _appBarHeight = 256.0;
 
   File imageFile;
@@ -264,16 +262,18 @@ class MyProfileState extends State<MyProfile> {
   User _userInfo = new User(); //model/user.dart
   FirebaseUser firebaseUser;
   _GroupInfo _groupInfo;
-  initState()  {
+
+  initState() {
     super.initState();
     isLoading = false;
-     LoginAPI.currentUser().then((user) {
+    LoginAPI.currentUser().then((user) {
       setState(() {
         firebaseUser = user;
         _userInfo.id = user.uid;
       });
     });
   }
+
   Widget buildAvatar(BuildContext context, DocumentSnapshot document) {
     return CachedNetworkImage(
       placeholder: Container(
@@ -281,7 +281,7 @@ class MyProfileState extends State<MyProfile> {
           valueColor: AlwaysStoppedAnimation<Color>(themeColor),
         ),
         decoration: BoxDecoration(
-          color: greyColor2,
+          color: subColor2,
         ),
       ),
       errorWidget: Material(
@@ -342,22 +342,22 @@ class MyProfileState extends State<MyProfile> {
     return Positioned(
       child: isLoading
           ? Container(
-              child: Center(
-                child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
-              ),
-              color: Colors.white.withOpacity(0.8),
-            )
+        child: Center(
+          child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+        ),
+        color: Colors.white.withOpacity(0.8),
+      )
           : Container(),
     );
   }
 
-  Widget buildFAB(bool isMyprofile){
-    IconData iconData = isMyprofile? Icons.save: Icons.message;
+  Widget buildFAB(bool isMyprofile) {
+    IconData iconData = isMyprofile ? Icons.save : Icons.message;
     return FloatingActionButton(
       onPressed: () {
-        if(isMyprofile){
-          if(_groupInfo!=null) _groupInfo.doUpdate(context);
+        if (isMyprofile) {
+          if (_groupInfo != null) _groupInfo.doUpdate(context);
         }
       },
       child: Icon(iconData),
@@ -368,21 +368,23 @@ class MyProfileState extends State<MyProfile> {
 
   @override
   Widget build(BuildContext context) {
-    if(firebaseUser == null){
+    if (firebaseUser == null) {
       return Container(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(themeColor),
         ),
         decoration: BoxDecoration(
-          color: greyColor2,
+          color: subColor2,
         ),
       );
     }
     return Theme(
       data: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.blueGrey,
-        platform: Theme.of(context).platform,
+        primarySwatch: themeColor,
+        platform: Theme
+            .of(context)
+            .platform,
       ),
       child: Scaffold(
         key: _scaffoldKey,
@@ -413,20 +415,20 @@ class MyProfileState extends State<MyProfile> {
                     });
                   },
                   itemBuilder: (BuildContext context) =>
-                      <PopupMenuItem<AppBarBehavior>>[
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.normal,
-                            child: Text('App bar scrolls away')),
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.pinned,
-                            child: Text('App bar stays put')),
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.floating,
-                            child: Text('App bar floats')),
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.snapping,
-                            child: Text('App bar snaps')),
-                      ],
+                  <PopupMenuItem<AppBarBehavior>>[
+                    const PopupMenuItem<AppBarBehavior>(
+                        value: AppBarBehavior.normal,
+                        child: Text('App bar scrolls away')),
+                    const PopupMenuItem<AppBarBehavior>(
+                        value: AppBarBehavior.pinned,
+                        child: Text('App bar stays put')),
+                    const PopupMenuItem<AppBarBehavior>(
+                        value: AppBarBehavior.floating,
+                        child: Text('App bar floats')),
+                    const PopupMenuItem<AppBarBehavior>(
+                        value: AppBarBehavior.snapping,
+                        child: Text('App bar snaps')),
+                  ],
                 ),
               ],
               flexibleSpace: FlexibleSpaceBar(
@@ -456,7 +458,7 @@ class MyProfileState extends State<MyProfile> {
                           return Center(
                             child: CircularProgressIndicator(
                               valueColor:
-                                  AlwaysStoppedAnimation<Color>(themeColor),
+                              AlwaysStoppedAnimation<Color>(themeColor),
                             ),
                           );
                         } else {
@@ -508,7 +510,8 @@ class MyProfileState extends State<MyProfile> {
                       _userInfo.phoneNumber = data['phoneNumber'];
                       _userInfo.gender = data['gender'];
                       _userInfo.userName = data['nickName'];
-                      _groupInfo = new _GroupInfo(user: _userInfo, isMyProfile: widget.isMyProfile,);
+                      _groupInfo = new _GroupInfo(
+                        user: _userInfo);
                       return _groupInfo;
                     }
                   },

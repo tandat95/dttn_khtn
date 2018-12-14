@@ -168,25 +168,35 @@ class _GroupInfo extends StatelessWidget {
     return Card(
         margin: const EdgeInsets.all(16),
         child: new Column(
-            //mainAxisSize: MainAxisSize.min,
+          //mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    groupIcon,
-                    color: Colors.blueGrey,
-                  ),
-                  Text(
-                    tittle,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  verticalDirection: VerticalDirection.down,
+                  children: <Widget>[
+                    Icon(
+                      groupIcon,
+                      color: themeColor,
+                      size: 20,
+                    ),
+                    Text(
+                      ' '+tittle,
+                      style: TextStyle(fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: titleColorH2),
+                    ),
+                  ],
+                ),
+                height: 30,
+                padding: EdgeInsets.all(10),
               ),
+
               new Container(
-                  margin: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(
+                      left: 16, right: 16, bottom: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: childs,
@@ -255,7 +265,7 @@ class UserProfileState extends State<UserProfile> {
           valueColor: AlwaysStoppedAnimation<Color>(themeColor),
         ),
         decoration: BoxDecoration(
-          color: greyColor2,
+          color: subColor2,
         ),
       ),
       errorWidget: Material(
@@ -311,14 +321,14 @@ class UserProfileState extends State<UserProfile> {
           valueColor: AlwaysStoppedAnimation<Color>(themeColor),
         ),
         decoration: BoxDecoration(
-          color: greyColor2,
+          color: subColor2,
         ),
       );
     }
     return Theme(
       data: ThemeData(
         brightness: Brightness.light,
-        primarySwatch: Colors.blueGrey,
+        primarySwatch: themeColor,
         platform: Theme.of(context).platform,
       ),
       child: Scaffold(
