@@ -95,6 +95,17 @@ class _GroupInfo extends StatelessWidget {
         }).toList(),
         onSaved: (val) => user.gender = val,
       ),
+      new TextFormField(
+        decoration: new InputDecoration(
+          labelText: 'About you',
+          icon: Icon(Icons.info),
+        ),
+        initialValue: user.desciption,
+        keyboardType: TextInputType.multiline,
+        maxLines: 3,
+        maxLength: 100,
+        onSaved: (val) => user.desciption = val,
+      )
     ];
   }
 
@@ -210,6 +221,7 @@ class _GroupInfo extends StatelessWidget {
       'rosName': user.rosName,
       'fifaName': user.fifaName,
       'sokName': user.sokName,
+      'aboutMe':user.desciption
     });
     final snackBar = SnackBar(content: Text('Update successfully!'));
     Scaffold.of(context).showSnackBar(snackBar);
@@ -508,6 +520,7 @@ class MyProfileState extends State<MyProfile> {
                       _userInfo.phoneNumber = data['phoneNumber'];
                       _userInfo.gender = data['gender'];
                       _userInfo.userName = data['nickName'];
+                      _userInfo.desciption = data['aboutMe'];
                       _groupInfo = new _GroupInfo(
                         user: _userInfo);
                       return _groupInfo;

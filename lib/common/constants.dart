@@ -19,6 +19,7 @@ const EMAILLOGIN ='emailLogin';
 const EMAILREG = 'emailReg';
 
 int TAB_INDEX = 0;
+bool NEW_MES = false;
 
 final MaterialColor primaryColor = Colors.deepOrange;
 final MaterialColor themeColor = Colors.deepOrange;

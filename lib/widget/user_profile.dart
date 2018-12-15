@@ -24,6 +24,7 @@ import 'package:dttn_khtn/widget/chat.dart';
 
 class _GroupInfo extends StatelessWidget {
   final DocumentSnapshot document;
+
   _GroupInfo({Key key, this.document}) : super(key: key);
 
   static final formKey = new GlobalKey<FormState>();
@@ -34,7 +35,7 @@ class _GroupInfo extends StatelessWidget {
 
   String _genderVal = '';
 
-  User user (){
+  User user() {
     User _userInfo = new User();
     _userInfo.lolName = document['lolName'];
     _userInfo.sokName = document['sokName'];
@@ -46,11 +47,22 @@ class _GroupInfo extends StatelessWidget {
     _userInfo.phoneNumber = document['phoneNumber'];
     _userInfo.gender = document['gender'];
     _userInfo.userName = document['nickName'];
-   return _userInfo;
+    return _userInfo;
   }
 
   List<Widget> _UserInfoForm() {
     return [
+      new TextFormField(
+        enabled: false,
+        key: new Key('aboutMe'),
+        maxLines: 3,
+        decoration: new InputDecoration(
+          labelText: 'Description',
+          icon: Icon(Icons.info),
+        ),
+        initialValue: document['aboutMe'],
+        autocorrect: false,
+      ),
       new TextFormField(
         enabled: false,
         key: new Key('username'),
@@ -68,7 +80,7 @@ class _GroupInfo extends StatelessWidget {
           labelText: 'Email',
           icon: Icon(Icons.email),
         ),
-        initialValue:document['email'],
+        initialValue: document['email'],
         autocorrect: false,
       ),
       new TextFormField(
@@ -168,7 +180,7 @@ class _GroupInfo extends StatelessWidget {
     return Card(
         margin: const EdgeInsets.all(16),
         child: new Column(
-          //mainAxisSize: MainAxisSize.min,
+            //mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
                 child: Row(
@@ -183,8 +195,9 @@ class _GroupInfo extends StatelessWidget {
                       size: 20,
                     ),
                     Text(
-                      ' '+tittle,
-                      style: TextStyle(fontWeight: FontWeight.bold,
+                      ' ' + tittle,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
                           fontSize: 16,
                           color: titleColorH2),
                     ),
@@ -193,10 +206,9 @@ class _GroupInfo extends StatelessWidget {
                 height: 30,
                 padding: EdgeInsets.all(10),
               ),
-
               new Container(
-                  margin: const EdgeInsets.only(
-                      left: 16, right: 16, bottom: 16),
+                  margin:
+                      const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: childs,
@@ -296,7 +308,7 @@ class UserProfileState extends State<UserProfile> {
     );
   }
 
-  Widget buildFAB(bool isMyprofile) {
+  Widget buildFAB() {
     return FloatingActionButton(
       onPressed: () {
         Navigator.push(
@@ -333,7 +345,37 @@ class UserProfileState extends State<UserProfile> {
       ),
       child: Scaffold(
         key: _scaffoldKey,
-        floatingActionButton: buildFAB(true),
+        floatingActionButton: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            FloatingActionButton(
+              heroTag: null,
+              child: Icon(
+                Icons.person_add,
+                color: Colors.white,
+              ),
+              onPressed: () {
+
+              },
+              mini: true,
+            ),
+            FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    new MaterialPageRoute(
+                        builder: (context) => new Chat(
+                              peerId: widget.document.documentID,
+                              peerAvatar: widget.document['photoUrl'],
+                            )));
+              },
+              heroTag: null,
+              child: Icon(Icons.message),
+              mini: true,
+            ),
+          ],
+        ),
         body: CustomScrollView(
           slivers: <Widget>[
             SliverAppBar(
@@ -367,7 +409,7 @@ class UserProfileState extends State<UserProfile> {
                 ),
               ],
               flexibleSpace: FlexibleSpaceBar(
-                title: Text(widget.document['nickName']) ,
+                title: Text(widget.document['nickName']),
                 background: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[

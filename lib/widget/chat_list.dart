@@ -69,7 +69,6 @@ class _ChatListState extends State<ChatList> {
       child: FlatButton(
         child: Column(
           children: <Widget>[
-
             Row(
               children: <Widget>[
                 Material(

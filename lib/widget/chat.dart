@@ -191,7 +191,8 @@ class ChatScreenState extends State<ChatScreen> {
           {
             'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
             'lastContent': content,
-            'type': type
+            'type': type,
+            'unRead': true
           },
         );
         await transaction.set(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:dttn_khtn/widget/user_list.dart';
@@ -5,6 +7,7 @@ import 'package:dttn_khtn/widget/chat_list.dart';
 import 'package:dttn_khtn/widget/my_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dttn_khtn/common/constants.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:dttn_khtn/widget/make_money.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -20,12 +23,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex;
+  bool _unReadMes;
+  static String id;
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
-
+  StreamSubscription<Event> _onNoteAddedSubscription;
   @override
   void initState() {
     super.initState();
+    id = widget.user.uid;
+    _onNoteAddedSubscription = notesReference.onChildAdded.listen(_onNoteAdded);
     _currentIndex = TAB_INDEX;
+    _unReadMes = TAB_INDEX !=1 && NEW_MES;
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) {
         print('on message $message');
@@ -40,15 +48,46 @@ class _MyHomePageState extends State<MyHomePage> {
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token) {
-      print(token);
+      print('token: $token');
     });
   }
+  DatabaseReference notesReference = FirebaseDatabase.instance.reference().child('users').child(id);
 
+  void _onNoteAdded(Event event) {
+   print(event.snapshot);
+  }
+  @override
+  void dispose() {
+    _onNoteAddedSubscription.cancel();
+    super.dispose();
+  }
   void onTabTapped(int index) {
+    notesReference.child('name').once().then((DataSnapshot snap){
+     print(snap.value);
+   });
     setState(() {
       _currentIndex = index;
       TAB_INDEX = index;
+      if (index == 1) {
+        _unReadMes = false;
+      }
     });
+  }
+
+  Widget setMesIcon() {
+    if (_unReadMes) {
+      return new Stack(children: <Widget>[
+        new Icon(Icons.mail),
+        new Positioned(
+          // draw a red marble
+          top: 0.0,
+          right: 0.0,
+          child:
+              new Icon(Icons.brightness_1, size: 10.0, color: Colors.redAccent),
+        )
+      ]);
+    }
+    return new Icon(Icons.mail);
   }
 
   @override
@@ -56,44 +95,41 @@ class _MyHomePageState extends State<MyHomePage> {
     //widget.user.uid
     final List<Widget> _children = [
       new ListUser(),
-      new ChatList(currentUserId: widget.user.uid,),
+      new ChatList(
+        currentUserId: widget.user.uid,
+      ),
       new MyProfile(user: widget.user),
-      new MakeMoney()
+      //new MakeMoney()
     ];
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       bottomNavigationBar: Theme(
-          data: Theme.of(context).copyWith(
+        data: Theme.of(context).copyWith(
             // sets the background color of the `BottomNavigationBar`
-              canvasColor: themeColor,
-              // sets the active color of the `BottomNavigationBar` if `Brightness` is light
-              //primaryColor: Colors.red,
-              textTheme: Theme
-                  .of(context)
-                  .textTheme
-                  .copyWith(caption: new TextStyle(color: primaryColor))),
-          child: BottomNavigationBar(
-            onTap: onTabTapped,
-            currentIndex: _currentIndex,
-            items: [
-              BottomNavigationBarItem(
-                icon: new Icon(Icons.home),
-                title: new Text('Home'),
-              ),
-              BottomNavigationBarItem(
-                icon: new Icon(Icons.mail),
-                title: new Text('Messages'),
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  title: Text('Profile')
-              ),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.attach_money),
-                  title: Text('Make money')
-              )
-            ],
-          ),
+            canvasColor: Colors.white,
+            // sets the active color of the `BottomNavigationBar` if `Brightness` is light
+            //primaryColor: Colors.red,
+            textTheme: Theme.of(context).textTheme.copyWith()),
+        child: BottomNavigationBar(
+          onTap: onTabTapped,
+          currentIndex: _currentIndex,
+          items: [
+            BottomNavigationBarItem(
+              icon: new Icon(Icons.home),
+              title: new Text('Home'),
+            ),
+            BottomNavigationBarItem(
+              icon: setMesIcon(),
+              title: new Text('Messages'),
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person), title: Text('Profile')),
+//              BottomNavigationBarItem(
+//                  icon: Icon(Icons.attach_money),
+//                  title: Text('Make money')
+//              )
+          ],
+        ),
       ),
       body: _children[_currentIndex],
     );

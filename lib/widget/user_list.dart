@@ -75,7 +75,7 @@ const List<Choice> choices = const <Choice>[
 //  const Choice(title: 'All', icon: Icons.list),
 //  const Choice(title: 'Online', icon: Icons.network_wifi),
   const Choice(title: 'All player', isPaid: false),
-  const Choice(title: 'Paid player', isPaid: true),
+  const Choice(title: 'Followed', isPaid: true),
 ];
 
 class ChoiceCard extends StatelessWidget {
