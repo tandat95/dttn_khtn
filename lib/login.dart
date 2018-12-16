@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
     switch (type){
       case GGLOGIN:
         try {
-         FirebaseUser user = await LoginAPI.signInWithGoogle();
+          CURRENT_USER = await LoginAPI.signInWithGoogle();
          widget.onSignIn();
         }
         catch (e) {
@@ -51,10 +51,10 @@ class _LoginPageState extends State<LoginPage> {
       case EMAILLOGIN:
         if (validateAndSave()) {
           try {
-            FirebaseUser user = _formType == FormType.login
+            CURRENT_USER = _formType == FormType.login
                 ? await LoginAPI.emailLogin(_email, _password)
                 : await LoginAPI.createUser(_email, _password);
-            var userId = user.uid;
+            var userId = CURRENT_USER.uid;
             setState(() {
               _authHint = 'Signed In\n\nUser id: $userId';
             });

@@ -4,9 +4,11 @@ import 'widget/home.dart';
 import 'package:dttn_khtn/loginAPI.dart';
 import 'package:dttn_khtn/widget/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dttn_khtn/common/constants.dart';
 
 class RootPage extends StatefulWidget {
   RootPage({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => new _RootPageState();
 }
@@ -18,13 +20,15 @@ enum AuthStatus {
 
 class _RootPageState extends State<RootPage> {
   AuthStatus authStatus = AuthStatus.notSignedIn;
-  FirebaseUser firebaseUser = null;
+
+
   initState() {
     super.initState();
     LoginAPI.currentUser().then((user) {
       setState(() {
-        authStatus = user != null ? AuthStatus.signedIn : AuthStatus.notSignedIn;
-        firebaseUser = user;
+        authStatus =
+            user != null ? AuthStatus.signedIn : AuthStatus.notSignedIn;
+        CURRENT_USER = user;
       });
     });
   }
@@ -45,15 +49,17 @@ class _RootPageState extends State<RootPage> {
         );
       case AuthStatus.signedIn:
         return FutureBuilder(
-          future: LoginAPI.currentUser(),
+            future: LoginAPI.currentUser(),
             builder: (context, snapshot) {
-          return snapshot.connectionState ==
-              ConnectionState.done
-              ? new MyHomePage(
-            title: 'Home', user: snapshot.data,onSignOut: () => _updateAuthStatus(AuthStatus.notSignedIn),
-          ):Container();
-        });
-
+              return snapshot.connectionState == ConnectionState.done
+                  ? new MyHomePage(
+                      title: 'Home',
+                      user: snapshot.data,
+                      onSignOut: () =>
+                          _updateAuthStatus(AuthStatus.notSignedIn),
+                    )
+                  : Container();
+            });
     }
   }
 }

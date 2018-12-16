@@ -26,14 +26,15 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _unReadMes;
   static String id;
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
-  StreamSubscription<Event> _onNoteAddedSubscription;
+  StreamSubscription<Event> _onNoteChangeSubscription;
+
   @override
   void initState() {
     super.initState();
     id = widget.user.uid;
-    _onNoteAddedSubscription = notesReference.onChildAdded.listen(_onNoteAdded);
+    _onNoteChangeSubscription = notesReference.onValue.listen(_onNoteChanged);
     _currentIndex = TAB_INDEX;
-    _unReadMes = TAB_INDEX !=1 && NEW_MES;
+    _unReadMes = TAB_INDEX != 1 && NEW_MES;
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) {
         print('on message $message');
@@ -48,28 +49,46 @@ class _MyHomePageState extends State<MyHomePage> {
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token) {
-      print('token: $token');
+      //print('token: $token');
     });
   }
-  DatabaseReference notesReference = FirebaseDatabase.instance.reference().child('users').child(id);
 
-  void _onNoteAdded(Event event) {
-   print(event.snapshot);
+  DatabaseReference notesReference = FirebaseDatabase.instance
+      .reference()
+      .child('users')
+      .child(CURRENT_USER.uid)
+      .child(UNREAD_MES);
+
+  void _onNoteChanged(Event event) {
+    NEW_MES = event.snapshot.value;
+    _unReadMes = TAB_INDEX != 1 && NEW_MES;
+    try{
+      setState(() {
+        _unReadMes = TAB_INDEX !=1 && NEW_MES;
+      });
+    }catch(Ex){
+
+    }
+
   }
+
   @override
   void dispose() {
-    _onNoteAddedSubscription.cancel();
+    _onNoteChangeSubscription.cancel();
     super.dispose();
   }
+
   void onTabTapped(int index) {
-    notesReference.child('name').once().then((DataSnapshot snap){
-     print(snap.value);
-   });
+//    notesReference.child('name').once().then((DataSnapshot snap){
+//     print(snap.value);
+//   });
+
     setState(() {
       _currentIndex = index;
       TAB_INDEX = index;
       if (index == 1) {
         _unReadMes = false;
+        setUnReadMesStatus(CURRENT_USER.uid,false);
       }
     });
   }

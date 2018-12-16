@@ -208,6 +208,7 @@ class ChatScreenState extends State<ChatScreen> {
           },
         );
       });
+      setUnReadMesStatus(peerId, true);
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     } else {

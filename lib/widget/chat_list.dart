@@ -25,44 +25,47 @@ class _ChatListState extends State<ChatList> {
     //const Choice(title: 'Log out', icon: Icons.exit_to_app),
   ];
 
-  String buildLastTime(messageDoc){
+  String buildLastTime(messageDoc) {
     var time = messageDoc['timestamp'];
-    if(time!=null){
-     int delta = DateTime.now().millisecondsSinceEpoch -  int.parse(time.toString());
-     delta = (delta/1000).floor();
-     if(delta<60){
-       return '$delta sec';
-     }else if(delta/60<60){
-       delta = (delta/60).floor();
-       return '$delta min';
-     }else if(delta/3600<24){
-       delta = (delta/3600).floor();
-       return '$delta hour';
-     }else{
-       var dateTime = new DateTime.fromMillisecondsSinceEpoch(int.parse(time));
-       var day = dateTime.day;
-       var month = dateTime.month;
-       var year = dateTime.year;
-       return '$day/$month/$year';
-     }
+    if (time != null) {
+      int delta =
+          DateTime.now().millisecondsSinceEpoch - int.parse(time.toString());
+      delta = (delta / 1000).floor();
+      if (delta < 60) {
+        return '$delta sec';
+      } else if (delta / 60 < 60) {
+        delta = (delta / 60).floor();
+        return '$delta min';
+      } else if (delta / 3600 < 24) {
+        delta = (delta / 3600).floor();
+        return '$delta hour';
+      } else {
+        var dateTime = new DateTime.fromMillisecondsSinceEpoch(int.parse(time));
+        var day = dateTime.day;
+        var month = dateTime.month;
+        var year = dateTime.year;
+        return '$day/$month/$year';
+      }
     }
     return '';
   }
-  String buildLastContent(messageDoc){
-    String content =  messageDoc['lastContent'];
-    if(content!=null){
-      var type =  messageDoc['type'];
-      if(type == 0){
-        if(content.length>25) return content.substring(0,25) + '...';
+
+  String buildLastContent(messageDoc) {
+    String content = messageDoc['lastContent'];
+    if (content != null) {
+      var type = messageDoc['type'];
+      if (type == 0) {
+        if (content.length > 25) return content.substring(0, 25) + '...';
         return content;
-      }else if(type==1){
+      } else if (type == 1) {
         return 'image..';
-      }else if(type ==2){
+      } else if (type == 2) {
         return 'ticker..';
       }
     }
     return '';
   }
+
   Widget buildItem(BuildContext context, DocumentSnapshot userDoc,
       DocumentSnapshot messageDoc) {
     return Container(
@@ -108,7 +111,8 @@ class _ChatListState extends State<ChatList> {
                         new Container(
                           child: Text(
                             buildLastContent(messageDoc),
-                            style: TextStyle(color: Colors.black26, fontSize: 13),
+                            style:
+                                TextStyle(color: Colors.black26, fontSize: 13),
                           ),
                           alignment: Alignment.centerLeft,
                           margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
@@ -118,10 +122,15 @@ class _ChatListState extends State<ChatList> {
                     margin: EdgeInsets.only(left: 20.0),
                   ),
                 ),
-                Text(buildLastTime(messageDoc), style: TextStyle(fontSize: 12),)
+                Text(
+                  buildLastTime(messageDoc),
+                  style: TextStyle(fontSize: 12),
+                )
               ],
             ),
-            Divider(height: 5,),
+            Divider(
+              height: 5,
+            ),
           ],
         ),
         onPressed: () {
@@ -198,24 +207,41 @@ class _ChatListState extends State<ChatList> {
                       padding: EdgeInsets.all(5.0),
                       itemBuilder: (context, index) {
                         var messDoc = snapshot.data.documents[index];
-                        return new FutureBuilder(
-                            future: Firestore.instance
-                                .collection('users')
-                                .document(
-                                    messDoc.documentID)
-                                .get(),
-                            builder: (context, snapshot) {
-                              return snapshot.connectionState ==
-                                      ConnectionState.done
-                                  ? buildItem(context, snapshot.data, messDoc)
-                                  : Center(
-                                      child: RefreshProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                themeColor),
-                                      ),
-                                    );
-                            });
+                        return StreamBuilder(
+                          stream: Firestore.instance
+                              .collection('users')
+                              .document(messDoc.documentID)
+                              .snapshots(),
+                          builder: (context, snaps){
+                            if(!snaps.hasData){
+                              return Center(
+                                child: RefreshProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                                ),
+                              );
+                            }else{
+                              return buildItem(context, snaps.data, messDoc);
+                            }
+                          },
+                        );
+//                        return new FutureBuilder(
+//                            future: Firestore.instance
+//                                .collection('users')
+//                                .document(
+//                                    messDoc.documentID)
+//                                .get(),
+//                            builder: (context, snapshot) {
+//                              return snapshot.connectionState ==
+//                                      ConnectionState.done
+//                                  ? buildItem(context, snapshot.data, messDoc)
+//                                  : Center(
+//                                      child: RefreshProgressIndicator(
+//                                        valueColor:
+//                                            AlwaysStoppedAnimation<Color>(
+//                                                themeColor),
+//                                      ),
+//                                    );
+//                            });
                       },
                       itemCount: snapshot.data.documents.length,
                     );
@@ -247,6 +273,7 @@ class _ChatListState extends State<ChatList> {
 
 class Choice {
   const Choice({this.title, this.icon});
+
   final String title;
   final IconData icon;
 }

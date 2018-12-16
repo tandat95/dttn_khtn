@@ -54,6 +54,16 @@ class _GroupInfo extends StatelessWidget {
     return [
       new TextFormField(
         enabled: false,
+        key: new Key('following'),
+        decoration: new InputDecoration(
+          labelText: 'Following',
+          icon: Icon(Icons.text_fields),
+        ),
+        initialValue: document['following'].toString(),
+        autocorrect: false,
+      ),
+      new TextFormField(
+        enabled: false,
         key: new Key('aboutMe'),
         maxLines: 3,
         decoration: new InputDecoration(
@@ -240,9 +250,13 @@ Widget padded({Widget child}) {
 }
 
 class UserProfile extends StatefulWidget {
-  const UserProfile({Key key, this.document}) : super(key: key);
+  const UserProfile({
+    Key key,
+    @required this.document,
+    @required this.followed,
+  }) : super(key: key);
   final DocumentSnapshot document;
-  static const String routeName = '/contacts';
+  final bool followed;
 
   @override
   UserProfileState createState() => UserProfileState();
@@ -259,13 +273,17 @@ class UserProfileState extends State<UserProfile> {
   bool isLoading;
   User _userInfo = new User(); //model/user.dart
   _GroupInfo _groupInfo;
+  int _numFollow;
+  bool _followed;
 
   initState() {
     super.initState();
     isLoading = false;
+    _followed = widget.followed;
     LoginAPI.currentUser().then((user) {
       setState(() {
         _userInfo.id = widget.document['id'];
+        _numFollow = widget.document['following'];
       });
     });
   }
@@ -323,6 +341,36 @@ class UserProfileState extends State<UserProfile> {
     );
   }
 
+  void onFollowClick(String userId, int numFollow) async {
+    if (!_followed) {
+      setState(() {
+        _followed = !_followed;
+      });
+      await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .updateData({'following': numFollow != null ? numFollow + 1 : 1});
+      FOLLOWED_LIST.add(userId);
+      await Firestore.instance
+          .collection('users')
+          .document(CURRENT_USER.uid)
+          .updateData({'followed': FOLLOWED_LIST});
+    } else {
+      setState(() {
+        _followed = !_followed;
+      });
+      await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .updateData({'following': numFollow != null ? numFollow - 1 : 0});
+      FOLLOWED_LIST.remove(userId);
+      await Firestore.instance
+          .collection('users')
+          .document(CURRENT_USER.uid)
+          .updateData({'followed': FOLLOWED_LIST});
+    }
+  }
+
   AppBarBehavior _appBarBehavior = AppBarBehavior.pinned;
 
   @override
@@ -337,107 +385,87 @@ class UserProfileState extends State<UserProfile> {
         ),
       );
     }
-    return Theme(
-      data: ThemeData(
-        brightness: Brightness.light,
-        primarySwatch: themeColor,
-        platform: Theme.of(context).platform,
-      ),
-      child: Scaffold(
-        key: _scaffoldKey,
-        floatingActionButton: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            FloatingActionButton(
-              heroTag: null,
-              child: Icon(
-                Icons.person_add,
-                color: Colors.white,
-              ),
-              onPressed: () {
-
-              },
-              mini: true,
-            ),
-            FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    new MaterialPageRoute(
-                        builder: (context) => new Chat(
+    return StreamBuilder(
+      stream: Firestore.instance.collection('users').document(widget.document['id']).snapshots(),
+      builder: (context, snapshot){
+        var doc = snapshot.data;
+        return Theme(
+          data: ThemeData(
+            brightness: Brightness.light,
+            primarySwatch: themeColor,
+            platform: Theme.of(context).platform,
+          ),
+          child: Scaffold(
+            key: _scaffoldKey,
+            floatingActionButton: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                FloatingActionButton(
+                  heroTag: null,
+                  child: Icon(
+                    _followed ? Icons.favorite : Icons.favorite_border,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => onFollowClick(_userInfo.id, doc['following']),
+                  mini: true,
+                ),
+                FloatingActionButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        new MaterialPageRoute(
+                            builder: (context) => new Chat(
                               peerId: widget.document.documentID,
                               peerAvatar: widget.document['photoUrl'],
                             )));
-              },
-              heroTag: null,
-              child: Icon(Icons.message),
-              mini: true,
-            ),
-          ],
-        ),
-        body: CustomScrollView(
-          slivers: <Widget>[
-            SliverAppBar(
-              expandedHeight: _appBarHeight,
-              pinned: _appBarBehavior == AppBarBehavior.pinned,
-              floating: _appBarBehavior == AppBarBehavior.floating ||
-                  _appBarBehavior == AppBarBehavior.snapping,
-              snap: _appBarBehavior == AppBarBehavior.snapping,
-              actions: <Widget>[
-                PopupMenuButton<AppBarBehavior>(
-                  onSelected: (AppBarBehavior value) {
-                    setState(() {
-                      _appBarBehavior = value;
-                    });
                   },
-                  itemBuilder: (BuildContext context) =>
-                      <PopupMenuItem<AppBarBehavior>>[
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.normal,
-                            child: Text('App bar scrolls away')),
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.pinned,
-                            child: Text('App bar stays put')),
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.floating,
-                            child: Text('App bar floats')),
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.snapping,
-                            child: Text('App bar snaps')),
-                      ],
+                  heroTag: null,
+                  child: Icon(Icons.message),
+                  mini: true,
                 ),
               ],
-              flexibleSpace: FlexibleSpaceBar(
-                title: Text(widget.document['nickName']),
-                background: Stack(
-                  fit: StackFit.expand,
-                  children: <Widget>[
-                    CachedNetworkImage(
-                      imageUrl: widget.document['photoUrl'],
-                      fit: BoxFit.cover,
-                    ),
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment(0.0, -1.0),
-                          end: Alignment(0.0, -0.4),
-                          colors: <Color>[Color(0x60000000), Color(0x00000000)],
+            ),
+            body: CustomScrollView(
+              slivers: <Widget>[
+                SliverAppBar(
+                  expandedHeight: _appBarHeight,
+                  pinned: _appBarBehavior == AppBarBehavior.pinned,
+                  floating: _appBarBehavior == AppBarBehavior.floating ||
+                      _appBarBehavior == AppBarBehavior.snapping,
+                  snap: _appBarBehavior == AppBarBehavior.snapping,
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: Text(widget.document['nickName']),
+                    background: Stack(
+                      fit: StackFit.expand,
+                      children: <Widget>[
+                        CachedNetworkImage(
+                          imageUrl: widget.document['photoUrl'],
+                          fit: BoxFit.cover,
                         ),
-                      ),
+                        const DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment(0.0, -1.0),
+                              end: Alignment(0.0, -0.4),
+                              colors: <Color>[Color(0x60000000), Color(0x00000000)],
+                            ),
+                          ),
+                        ),
+                        buildLoading()
+                      ],
                     ),
-                    buildLoading()
-                  ],
+                  ),
                 ),
-              ),
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                      <Widget>[_GroupInfo(document: doc)]),
+                ),
+              ],
             ),
-            SliverList(
-              delegate: SliverChildListDelegate(
-                  <Widget>[_GroupInfo(document: widget.document)]),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
