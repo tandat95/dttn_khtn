@@ -78,7 +78,12 @@ class ChatScreenState extends State<ChatScreen> {
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
-
+    id =CURRENT_USER.uid;
+    Firestore.instance
+        .collection('users')
+        .document(id)
+        .collection("user_messages")
+        .document(peerId).updateData({'unRead': false});
     readLocal();
   }
 
@@ -184,10 +189,10 @@ class ChatScreenState extends State<ChatScreen> {
         //set last message
         await transaction.set(
           Firestore.instance
-              .collection('users')
-              .document(peerId)
-              .collection("user_messages")
-              .document(id),
+            .collection('users')
+            .document(peerId)
+            .collection("user_messages")
+            .document(id),
           {
             'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
             'lastContent': content,

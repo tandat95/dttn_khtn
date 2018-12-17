@@ -187,8 +187,8 @@ class ChoiceCard extends StatelessWidget {
               context,
               new MaterialPageRoute(
                   builder: (context) => new UserProfile(
-                        document: document ,
-                        followed: FOLLOWED_LIST.contains(document['id']),
+                        userId: document['id'] ,
+                        //followed: FOLLOWED_LIST.contains(document['id']),
                       )));
         },
         //color: subColor2,

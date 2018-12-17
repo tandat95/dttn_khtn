@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dttn_khtn/common/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:async';
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:dttn_khtn/model/user.dart';
-import 'package:dttn_khtn/loginAPI.dart';
 import 'package:dttn_khtn/widget/chat.dart';
 
 //class _GroupInfo extends StatefulWidget {
@@ -52,16 +47,6 @@ class _GroupInfo extends StatelessWidget {
 
   List<Widget> _UserInfoForm() {
     return [
-      new TextFormField(
-        enabled: false,
-        key: new Key('following'),
-        decoration: new InputDecoration(
-          labelText: 'Following',
-          icon: Icon(Icons.text_fields),
-        ),
-        initialValue: document['following'].toString(),
-        autocorrect: false,
-      ),
       new TextFormField(
         enabled: false,
         key: new Key('aboutMe'),
@@ -188,7 +173,7 @@ class _GroupInfo extends StatelessWidget {
 
   Widget cardContainer(IconData groupIcon, String tittle, List<Widget> childs) {
     return Card(
-        margin: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
         child: new Column(
             //mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -207,9 +192,10 @@ class _GroupInfo extends StatelessWidget {
                     Text(
                       ' ' + tittle,
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: titleColorH2),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: themeColor,
+                      ),
                     ),
                   ],
                 ),
@@ -252,14 +238,11 @@ Widget padded({Widget child}) {
 class UserProfile extends StatefulWidget {
   const UserProfile({
     Key key,
-    @required this.document,
-    @required this.followed,
+    @required this.userId,
   }) : super(key: key);
-  final DocumentSnapshot document;
-  final bool followed;
-
+  final String userId;
   @override
-  UserProfileState createState() => UserProfileState();
+  UserProfileState createState() => UserProfileState(this.userId);
 }
 
 enum AppBarBehavior { normal, pinned, floating, snapping }
@@ -268,24 +251,27 @@ class UserProfileState extends State<UserProfile> {
   static final GlobalKey<ScaffoldState> _scaffoldKey =
       GlobalKey<ScaffoldState>();
   final double _appBarHeight = 256.0;
-
+  final String userId;
   File imageFile;
   bool isLoading;
   User _userInfo = new User(); //model/user.dart
   _GroupInfo _groupInfo;
-  int _numFollow;
+  //int _numFollow;
   bool _followed;
+
+  UserProfileState(@required this.userId);
 
   initState() {
     super.initState();
     isLoading = false;
-    _followed = widget.followed;
-    LoginAPI.currentUser().then((user) {
-      setState(() {
-        _userInfo.id = widget.document['id'];
-        _numFollow = widget.document['following'];
-      });
-    });
+    _followed =FOLLOWED_LIST.contains(userId);
+    _userInfo.id =userId;
+//    LoginAPI.currentUser().then((user) {
+//      setState(() {
+//
+//        //_numFollow = widget.document[FOLLOWER];
+//      });
+//    });
   }
 
   Widget buildAvatar(BuildContext context, DocumentSnapshot document) {
@@ -326,21 +312,6 @@ class UserProfileState extends State<UserProfile> {
     );
   }
 
-  Widget buildFAB() {
-    return FloatingActionButton(
-      onPressed: () {
-        Navigator.push(
-            context,
-            new MaterialPageRoute(
-                builder: (context) => new Chat(
-                      peerId: widget.document.documentID,
-                      peerAvatar: widget.document['photoUrl'],
-                    )));
-      },
-      child: Icon(Icons.message),
-    );
-  }
-
   void onFollowClick(String userId, int numFollow) async {
     if (!_followed) {
       setState(() {
@@ -349,12 +320,12 @@ class UserProfileState extends State<UserProfile> {
       await Firestore.instance
           .collection('users')
           .document(userId)
-          .updateData({'following': numFollow != null ? numFollow + 1 : 1});
+          .updateData({FOLLOWER: numFollow != null ? numFollow + 1 : 1});
       FOLLOWED_LIST.add(userId);
       await Firestore.instance
           .collection('users')
           .document(CURRENT_USER.uid)
-          .updateData({'followed': FOLLOWED_LIST});
+          .updateData({FOLLOWING: FOLLOWED_LIST});
     } else {
       setState(() {
         _followed = !_followed;
@@ -362,12 +333,12 @@ class UserProfileState extends State<UserProfile> {
       await Firestore.instance
           .collection('users')
           .document(userId)
-          .updateData({'following': numFollow != null ? numFollow - 1 : 0});
+          .updateData({FOLLOWER: numFollow != null ? numFollow - 1 : 0});
       FOLLOWED_LIST.remove(userId);
       await Firestore.instance
           .collection('users')
           .document(CURRENT_USER.uid)
-          .updateData({'followed': FOLLOWED_LIST});
+          .updateData({FOLLOWING: FOLLOWED_LIST});
     }
   }
 
@@ -375,7 +346,7 @@ class UserProfileState extends State<UserProfile> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.document == null) {
+    if (userId == null) {
       return Container(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(themeColor),
@@ -386,8 +357,18 @@ class UserProfileState extends State<UserProfile> {
       );
     }
     return StreamBuilder(
-      stream: Firestore.instance.collection('users').document(widget.document['id']).snapshots(),
-      builder: (context, snapshot){
+      stream: Firestore.instance
+          .collection('users')
+          .document(userId)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if(!snapshot.hasData){
+          return Center(
+            child: RefreshProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+            ),
+          );
+        }
         var doc = snapshot.data;
         return Theme(
           data: ThemeData(
@@ -407,8 +388,9 @@ class UserProfileState extends State<UserProfile> {
                     _followed ? Icons.favorite : Icons.favorite_border,
                     color: Colors.white,
                   ),
-                  onPressed: () => onFollowClick(_userInfo.id, doc['following']),
+                  onPressed: () => onFollowClick(_userInfo.id, doc[FOLLOWER]),
                   mini: true,
+                  backgroundColor: themeColor,
                 ),
                 FloatingActionButton(
                   onPressed: () {
@@ -416,13 +398,17 @@ class UserProfileState extends State<UserProfile> {
                         context,
                         new MaterialPageRoute(
                             builder: (context) => new Chat(
-                              peerId: widget.document.documentID,
-                              peerAvatar: widget.document['photoUrl'],
-                            )));
+                                  peerId: doc.documentID,
+                                  peerAvatar: doc['photoUrl'],
+                                )));
                   },
                   heroTag: null,
-                  child: Icon(Icons.message),
+                  child: Icon(
+                    Icons.message,
+                    color: Colors.white,
+                  ),
                   mini: true,
+                  backgroundColor: themeColor,
                 ),
               ],
             ),
@@ -435,12 +421,13 @@ class UserProfileState extends State<UserProfile> {
                       _appBarBehavior == AppBarBehavior.snapping,
                   snap: _appBarBehavior == AppBarBehavior.snapping,
                   flexibleSpace: FlexibleSpaceBar(
-                    title: Text(widget.document['nickName']),
+                    title: Text(doc['nickName']),
+                    centerTitle: false,
                     background: Stack(
                       fit: StackFit.expand,
                       children: <Widget>[
                         CachedNetworkImage(
-                          imageUrl: widget.document['photoUrl'],
+                          imageUrl: doc['photoUrl'],
                           fit: BoxFit.cover,
                         ),
                         const DecoratedBox(
@@ -448,7 +435,10 @@ class UserProfileState extends State<UserProfile> {
                             gradient: LinearGradient(
                               begin: Alignment(0.0, -1.0),
                               end: Alignment(0.0, -0.4),
-                              colors: <Color>[Color(0x60000000), Color(0x00000000)],
+                              colors: <Color>[
+                                Color(0x60000000),
+                                Color(0x00000000)
+                              ],
                             ),
                           ),
                         ),
@@ -458,8 +448,58 @@ class UserProfileState extends State<UserProfile> {
                   ),
                 ),
                 SliverList(
-                  delegate: SliverChildListDelegate(
-                      <Widget>[_GroupInfo(document: doc)]),
+                  delegate: SliverChildListDelegate(<Widget>[
+                    new SizedBox(
+                        width: double.infinity,
+                        height: 60,
+                        child: Container(
+                          child: Row(
+                              children: <Widget>[
+                                Column(
+                                  children: <Widget>[
+                                    Text(
+                                      doc[FOLLOWER] != null
+                                          ? doc[FOLLOWER].toString()
+                                          : '0',
+                                      style: TextStyle(
+                                          fontSize: 25,
+                                          color: themeColor,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      'Follower',
+                                      style: TextStyle(fontSize: 15),
+                                    )
+                                  ],
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                ),
+                                VerticalDivider(
+                                  color: Colors.grey,
+                                ),
+                                Column(
+                                  children: <Widget>[
+                                    Text(
+                                        doc[FOLLOWING] != null
+                                            ? doc[FOLLOWING].length.toString()
+                                            : '0',
+                                        style: TextStyle(
+                                            fontSize: 25,
+                                            color: themeColor,
+                                            fontWeight: FontWeight.bold)),
+                                    Text(
+                                      'Following',
+                                      style: TextStyle(fontSize: 15),
+                                    )
+                                  ],
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                )
+                              ],
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center),
+                          //color: Colors.black26,
+                        )),
+                    _GroupInfo(document: doc)
+                  ]),
                 ),
               ],
             ),

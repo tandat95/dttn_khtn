@@ -9,6 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dttn_khtn/common/constants.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:dttn_khtn/widget/make_money.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title, this.user, this.onSignOut})
@@ -113,7 +115,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     //widget.user.uid
     final List<Widget> _children = [
-      new ListUser(),
+      StreamBuilder(
+        stream: Firestore.instance.collection('users').document(CURRENT_USER.uid).snapshots(),
+        builder: (context, snapshot){
+          if(!snapshot.hasData){
+            return SET_LOADING();
+          }
+          FOLLOWED_LIST = snapshot.data[FOLLOWING];
+          return new ListUser();
+        },
+      ),
       new ChatList(
         currentUserId: widget.user.uid,
       ),

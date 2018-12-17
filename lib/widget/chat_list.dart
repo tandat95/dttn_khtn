@@ -50,20 +50,26 @@ class _ChatListState extends State<ChatList> {
     return '';
   }
 
-  String buildLastContent(messageDoc) {
+  Widget buildLastContent(messageDoc) {
+    Color textColor = Colors.black26;
+    if (messageDoc['unRead']== true) {
+      textColor = Colors.black87;
+    }
     String content = messageDoc['lastContent'];
     if (content != null) {
       var type = messageDoc['type'];
       if (type == 0) {
-        if (content.length > 25) return content.substring(0, 25) + '...';
-        return content;
+        if (content.length > 25) content = content.substring(0, 25) + '...';
       } else if (type == 1) {
-        return 'image..';
+        content = 'image..';
       } else if (type == 2) {
-        return 'ticker..';
+        content = 'ticker..';
       }
     }
-    return '';
+    return Text(
+      content,
+      style: TextStyle(color: textColor, fontSize: 13),
+    );
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot userDoc,
@@ -109,11 +115,7 @@ class _ChatListState extends State<ChatList> {
                           margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
                         ),
                         new Container(
-                          child: Text(
-                            buildLastContent(messageDoc),
-                            style:
-                                TextStyle(color: Colors.black26, fontSize: 13),
-                          ),
+                          child: buildLastContent(messageDoc),
                           alignment: Alignment.centerLeft,
                           margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
                         )
@@ -212,14 +214,15 @@ class _ChatListState extends State<ChatList> {
                               .collection('users')
                               .document(messDoc.documentID)
                               .snapshots(),
-                          builder: (context, snaps){
-                            if(!snaps.hasData){
+                          builder: (context, snaps) {
+                            if (!snaps.hasData) {
                               return Center(
                                 child: RefreshProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(themeColor),
                                 ),
                               );
-                            }else{
+                            } else {
                               return buildItem(context, snaps.data, messDoc);
                             }
                           },

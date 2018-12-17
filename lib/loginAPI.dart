@@ -80,7 +80,7 @@ class LoginAPI {
         Firestore.instance.collection('users').document(user.uid).setData({
           'nickName': user.displayName,
           'photoUrl': user.photoUrl,
-          'id': user.uid
+          'id': user.uid,
         });
       }
     }

@@ -16,6 +16,8 @@ const USER_NAME = 'userName';
 const USER_LIST = 'userList';
 const AVATAR_BASE_NAME = 'avatarImage';
 const UNREAD_MES = 'unReadMes';
+const FOLLOWING = 'following';
+const FOLLOWER = 'follower';
 
 const GGLOGIN = 'googleLogin';
 const EMAILLOGIN = 'emailLogin';
@@ -23,7 +25,7 @@ const EMAILREG = 'emailReg';
 
 int TAB_INDEX = 0;
 bool NEW_MES = false;
-List<String> FOLLOWED_LIST = new List();
+List<dynamic> FOLLOWED_LIST = new List();
 
 FirebaseUser CURRENT_USER;
 
@@ -44,4 +46,12 @@ void setUnReadMesStatus(String userId, bool isRead) {
         .child(userId)
         .update({UNREAD_MES: isRead});
   }
+}
+
+Widget SET_LOADING (){
+  Center(
+    child: RefreshProgressIndicator(
+      valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+    ),
+  );
 }

@@ -168,35 +168,36 @@ class _GroupInfo extends StatelessWidget {
     return Card(
         margin: const EdgeInsets.all(16),
         child: new Column(
-          //mainAxisSize: MainAxisSize.min,
+            //mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    verticalDirection: VerticalDirection.down,
-                    children: <Widget>[
-                      Icon(
-                        groupIcon,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  verticalDirection: VerticalDirection.down,
+                  children: <Widget>[
+                    Icon(
+                      groupIcon,
+                      color: themeColor,
+                      size: 20,
+                    ),
+                    Text(
+                      ' ' + tittle,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                         color: themeColor,
-                        size: 20,
                       ),
-                      Text(
-                        ' '+tittle,
-                        style: TextStyle(fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: titleColorH2),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
                 height: 30,
                 padding: EdgeInsets.all(10),
               ),
-
               new Container(
-                  margin: const EdgeInsets.only(
-                      left: 16, right: 16, bottom: 16),
+                  margin:
+                      const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: childs,
@@ -207,10 +208,7 @@ class _GroupInfo extends StatelessWidget {
   void doUpdate(BuildContext context) async {
     var form = formKey.currentState;
     form.save();
-    await Firestore.instance
-        .collection('users')
-        .document(user.id)
-        .updateData({
+    await Firestore.instance.collection('users').document(user.id).updateData({
       'nickName': user.userName,
       'lolName': user.lolName,
       'gender': user.gender,
@@ -221,7 +219,7 @@ class _GroupInfo extends StatelessWidget {
       'rosName': user.rosName,
       'fifaName': user.fifaName,
       'sokName': user.sokName,
-      'aboutMe':user.desciption
+      'aboutMe': user.desciption
     });
     final snackBar = SnackBar(content: Text('Update successfully!'));
     Scaffold.of(context).showSnackBar(snackBar);
@@ -251,8 +249,7 @@ Widget padded({Widget child}) {
 }
 
 class MyProfile extends StatefulWidget {
-  const MyProfile({Key key, this.user})
-      : super(key: key);
+  const MyProfile({Key key, this.user}) : super(key: key);
   final FirebaseUser user;
   static const String routeName = '/contacts';
 
@@ -264,7 +261,7 @@ enum AppBarBehavior { normal, pinned, floating, snapping }
 
 class MyProfileState extends State<MyProfile> {
   static final GlobalKey<ScaffoldState> _scaffoldKey =
-  GlobalKey<ScaffoldState>();
+      GlobalKey<ScaffoldState>();
   final double _appBarHeight = 256.0;
 
   File imageFile;
@@ -352,12 +349,12 @@ class MyProfileState extends State<MyProfile> {
     return Positioned(
       child: isLoading
           ? Container(
-        child: Center(
-          child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
-        ),
-        color: Colors.white.withOpacity(0.8),
-      )
+              child: Center(
+                child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(themeColor)),
+              ),
+              color: Colors.white.withOpacity(0.8),
+            )
           : Container(),
     );
   }
@@ -370,7 +367,11 @@ class MyProfileState extends State<MyProfile> {
           if (_groupInfo != null) _groupInfo.doUpdate(context);
         }
       },
-      child: Icon(iconData),
+      child: Icon(
+        iconData,
+        color: Colors.white,
+      ),
+      backgroundColor: themeColor,
     );
   }
 
@@ -392,9 +393,7 @@ class MyProfileState extends State<MyProfile> {
       data: ThemeData(
         brightness: Brightness.light,
         primarySwatch: themeColor,
-        platform: Theme
-            .of(context)
-            .platform,
+        platform: Theme.of(context).platform,
       ),
       child: Scaffold(
         key: _scaffoldKey,
@@ -425,20 +424,20 @@ class MyProfileState extends State<MyProfile> {
                     });
                   },
                   itemBuilder: (BuildContext context) =>
-                  <PopupMenuItem<AppBarBehavior>>[
-                    const PopupMenuItem<AppBarBehavior>(
-                        value: AppBarBehavior.normal,
-                        child: Text('App bar scrolls away')),
-                    const PopupMenuItem<AppBarBehavior>(
-                        value: AppBarBehavior.pinned,
-                        child: Text('App bar stays put')),
-                    const PopupMenuItem<AppBarBehavior>(
-                        value: AppBarBehavior.floating,
-                        child: Text('App bar floats')),
-                    const PopupMenuItem<AppBarBehavior>(
-                        value: AppBarBehavior.snapping,
-                        child: Text('App bar snaps')),
-                  ],
+                      <PopupMenuItem<AppBarBehavior>>[
+                        const PopupMenuItem<AppBarBehavior>(
+                            value: AppBarBehavior.normal,
+                            child: Text('App bar scrolls away')),
+                        const PopupMenuItem<AppBarBehavior>(
+                            value: AppBarBehavior.pinned,
+                            child: Text('App bar stays put')),
+                        const PopupMenuItem<AppBarBehavior>(
+                            value: AppBarBehavior.floating,
+                            child: Text('App bar floats')),
+                        const PopupMenuItem<AppBarBehavior>(
+                            value: AppBarBehavior.snapping,
+                            child: Text('App bar snaps')),
+                      ],
                 ),
               ],
               flexibleSpace: FlexibleSpaceBar(
@@ -468,7 +467,7 @@ class MyProfileState extends State<MyProfile> {
                           return Center(
                             child: CircularProgressIndicator(
                               valueColor:
-                              AlwaysStoppedAnimation<Color>(themeColor),
+                                  AlwaysStoppedAnimation<Color>(themeColor),
                             ),
                           );
                         } else {
@@ -504,8 +503,7 @@ class MyProfileState extends State<MyProfile> {
                     if (!snapshot.hasData) {
                       return Center(
                         child: CircularProgressIndicator(
-                          valueColor:
-                          AlwaysStoppedAnimation<Color>(themeColor),
+                          valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                         ),
                       );
                     } else {
@@ -521,15 +519,72 @@ class MyProfileState extends State<MyProfile> {
                       _userInfo.gender = data['gender'];
                       _userInfo.userName = data['nickName'];
                       _userInfo.desciption = data['aboutMe'];
-                      _groupInfo = new _GroupInfo(
-                        user: _userInfo);
-                      return _groupInfo;
+                      _groupInfo = new _GroupInfo(user: _userInfo);
+                      return Column(
+                        children: <Widget>[
+                          new SizedBox(
+                              width: double.infinity,
+                              height: 60,
+                              child: Container(
+                                child: Row(
+                                    children: <Widget>[
+                                      Column(
+                                        children: <Widget>[
+                                          Text(
+                                            data[FOLLOWER] != null
+                                                ? data[FOLLOWER].toString()
+                                                : '0',
+                                            style: TextStyle(
+                                                fontSize: 25,
+                                                color: themeColor,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            'Follower',
+                                            style: TextStyle(fontSize: 15),
+                                          )
+                                        ],
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                      ),
+                                      VerticalDivider(
+                                        color: Colors.grey,
+                                      ),
+                                      Column(
+                                        children: <Widget>[
+                                          Text(
+                                              data[FOLLOWING] != null
+                                                  ? data[FOLLOWING]
+                                                      .length
+                                                      .toString()
+                                                  : '0',
+                                              style: TextStyle(
+                                                  fontSize: 25,
+                                                  color: themeColor,
+                                                  fontWeight: FontWeight.bold)),
+                                          Text(
+                                            'Following',
+                                            style: TextStyle(fontSize: 15),
+                                          )
+                                        ],
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                      )
+                                    ],
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center),
+                                //color: Colors.black26,
+                              )),
+                          _groupInfo
+                        ],
+                      );
                     }
                   },
                 ),
               ]),
             ),
-
           ],
         ),
       ),
