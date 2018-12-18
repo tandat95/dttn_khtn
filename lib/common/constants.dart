@@ -25,7 +25,7 @@ const EMAILREG = 'emailReg';
 
 int TAB_INDEX = 0;
 bool NEW_MES = false;
-List<dynamic> FOLLOWED_LIST = new List();
+List<String> FOLLOWED_LIST = new List();
 
 FirebaseUser CURRENT_USER;
 
@@ -49,7 +49,7 @@ void setUnReadMesStatus(String userId, bool isRead) {
 }
 
 Widget SET_LOADING (){
-  Center(
+ return Center(
     child: RefreshProgressIndicator(
       valueColor: AlwaysStoppedAnimation<Color>(themeColor),
     ),

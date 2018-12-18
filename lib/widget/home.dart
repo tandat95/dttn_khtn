@@ -11,7 +11,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:dttn_khtn/widget/make_money.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title, this.user, this.onSignOut})
       : super(key: key);
@@ -64,14 +63,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onNoteChanged(Event event) {
     NEW_MES = event.snapshot.value;
     _unReadMes = TAB_INDEX != 1 && NEW_MES;
-    try{
+    try {
       setState(() {
-        _unReadMes = TAB_INDEX !=1 && NEW_MES;
+        _unReadMes = TAB_INDEX != 1 && NEW_MES;
       });
-    }catch(Ex){
-
-    }
-
+    } catch (Ex) {}
   }
 
   @override
@@ -90,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
       TAB_INDEX = index;
       if (index == 1) {
         _unReadMes = false;
-        setUnReadMesStatus(CURRENT_USER.uid,false);
+        setUnReadMesStatus(CURRENT_USER.uid, false);
       }
     });
   }
@@ -116,13 +112,27 @@ class _MyHomePageState extends State<MyHomePage> {
     //widget.user.uid
     final List<Widget> _children = [
       StreamBuilder(
-        stream: Firestore.instance.collection('users').document(CURRENT_USER.uid).snapshots(),
-        builder: (context, snapshot){
-          if(!snapshot.hasData){
+        stream: Firestore.instance
+            .collection('users')
+            .document(CURRENT_USER.uid)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
             return SET_LOADING();
           }
-          FOLLOWED_LIST = snapshot.data[FOLLOWING];
-          return new ListUser();
+          if (snapshot.data[FOLLOWING] == null) {
+            Firestore.instance
+                .collection('users')
+                .document(CURRENT_USER.uid)
+                .updateData({FOLLOWING: new List<String>()}).then((data) {
+              setState(() {});
+            });
+          } else {
+            for (int i = 0; i < snapshot.data[FOLLOWING].length; i++) {
+              FOLLOWED_LIST.add(snapshot.data[FOLLOWING][i].toString());
+            }
+            return new ListUser();
+          }
         },
       ),
       new ChatList(
