@@ -241,6 +241,7 @@ class UserProfile extends StatefulWidget {
     @required this.userId,
   }) : super(key: key);
   final String userId;
+
   @override
   UserProfileState createState() => UserProfileState(this.userId);
 }
@@ -256,6 +257,7 @@ class UserProfileState extends State<UserProfile> {
   bool isLoading;
   User _userInfo = new User(); //model/user.dart
   _GroupInfo _groupInfo;
+
   //int _numFollow;
   bool _followed;
 
@@ -264,8 +266,8 @@ class UserProfileState extends State<UserProfile> {
   initState() {
     super.initState();
     isLoading = false;
-    _followed =FOLLOWED_LIST.contains(userId);
-    _userInfo.id =userId;
+    _followed = FOLLOWED_LIST.contains(userId);
+    _userInfo.id = userId;
 //    LoginAPI.currentUser().then((user) {
 //      setState(() {
 //
@@ -314,32 +316,25 @@ class UserProfileState extends State<UserProfile> {
 
   void onFollowClick(String userId, int numFollow) async {
     if (!_followed) {
-      setState(() {
-        _followed = !_followed;
-      });
-      await Firestore.instance
-          .collection('users')
-          .document(userId)
-          .updateData({FOLLOWER: numFollow != null ? numFollow + 1 : 1});
+      numFollow = numFollow != null ? numFollow + 1 : 1;
+
       FOLLOWED_LIST.add(userId);
-      await Firestore.instance
-          .collection('users')
-          .document(CURRENT_USER.uid)
-          .updateData({FOLLOWING: FOLLOWED_LIST});
     } else {
-      setState(() {
-        _followed = !_followed;
-      });
-      await Firestore.instance
-          .collection('users')
-          .document(userId)
-          .updateData({FOLLOWER: numFollow != null ? numFollow - 1 : 0});
+      numFollow = numFollow != null ? numFollow - 1 : 0;
       FOLLOWED_LIST.remove(userId);
-      await Firestore.instance
-          .collection('users')
-          .document(CURRENT_USER.uid)
-          .updateData({FOLLOWING: FOLLOWED_LIST});
     }
+    setState(() {
+      _followed = !_followed;
+    });
+    await Firestore.instance
+        .collection('users')
+        .document(userId)
+        .updateData({FOLLOWER: numFollow});
+    print(FOLLOWED_LIST);
+    await Firestore.instance
+        .collection('users')
+        .document(CURRENT_USER.uid)
+        .updateData({FOLLOWING: FOLLOWED_LIST});
   }
 
   AppBarBehavior _appBarBehavior = AppBarBehavior.pinned;
@@ -357,12 +352,10 @@ class UserProfileState extends State<UserProfile> {
       );
     }
     return StreamBuilder(
-      stream: Firestore.instance
-          .collection('users')
-          .document(userId)
-          .snapshots(),
+      stream:
+          Firestore.instance.collection('users').document(userId).snapshots(),
       builder: (context, snapshot) {
-        if(!snapshot.hasData){
+        if (!snapshot.hasData) {
           return Center(
             child: RefreshProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(themeColor),

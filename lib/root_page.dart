@@ -5,7 +5,7 @@ import 'package:dttn_khtn/loginAPI.dart';
 import 'package:dttn_khtn/widget/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dttn_khtn/common/constants.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 class RootPage extends StatefulWidget {
   RootPage({Key key}) : super(key: key);
 
@@ -58,7 +58,7 @@ class _RootPageState extends State<RootPage> {
                       onSignOut: () =>
                           _updateAuthStatus(AuthStatus.notSignedIn),
                     )
-                  : Container();
+                  : new Container();
             });
     }
   }

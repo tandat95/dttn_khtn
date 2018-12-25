@@ -111,30 +111,31 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     //widget.user.uid
     final List<Widget> _children = [
-      StreamBuilder(
-        stream: Firestore.instance
-            .collection('users')
-            .document(CURRENT_USER.uid)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return SET_LOADING();
-          }
-          if (snapshot.data[FOLLOWING] == null) {
-            Firestore.instance
-                .collection('users')
-                .document(CURRENT_USER.uid)
-                .updateData({FOLLOWING: new List<String>()}).then((data) {
-              setState(() {});
-            });
-          } else {
-            for (int i = 0; i < snapshot.data[FOLLOWING].length; i++) {
-              FOLLOWED_LIST.add(snapshot.data[FOLLOWING][i].toString());
+      FutureBuilder(
+          future: Firestore.instance
+              .collection('users')
+              .document(CURRENT_USER.uid)
+              .get(),
+          builder: (context, snapshot) {
+            if (!(snapshot.connectionState == ConnectionState.done)) {
+              //return SET_LOADING();
+              return new ListUser();
+            } else {
+              if (snapshot.data[FOLLOWING] == null) {
+                Firestore.instance
+                    .collection('users')
+                    .document(CURRENT_USER.uid)
+                    .updateData({FOLLOWING: new List<String>()}).then((data) {
+                });
+              } else {
+                FOLLOWED_LIST = new List<String>();
+                for (int i = 0; i < snapshot.data[FOLLOWING].length; i++) {
+                  FOLLOWED_LIST.add(snapshot.data[FOLLOWING][i].toString());
+                }
+              }
+              return new ListUser();
             }
-            return new ListUser();
-          }
-        },
-      ),
+          }),
       new ChatList(
         currentUserId: widget.user.uid,
       ),
