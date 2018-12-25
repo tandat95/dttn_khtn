@@ -54,6 +54,8 @@ flutter:
       - images/ic_female.png
       - images/ic_male.png
       - images/ic_game_money.png
+      - images/mimi2.gif
+      - images/mimi3.gif
 
   # To add assets to your application, add an assets section, like this:
   # assets:
