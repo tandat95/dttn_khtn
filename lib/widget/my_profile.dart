@@ -208,7 +208,7 @@ class _GroupInfo extends StatelessWidget {
   void doUpdate(BuildContext context) async {
     var form = formKey.currentState;
     form.save();
-    await Firestore.instance.collection('users').document(user.id).updateData({
+    await FIRESTORE.collection('users').document(user.id).updateData({
       'nickName': user.userName,
       'lolName': user.lolName,
       'gender': user.gender,
@@ -321,14 +321,14 @@ class MyProfileState extends State<MyProfile> {
         .child(AVATAR_BASE_NAME + firebaseUser.uid);
     StorageUploadTask uploadTask = reference.putFile(imageFile);
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
-    final QuerySnapshot result = await Firestore.instance
+    final QuerySnapshot result = await FIRESTORE
         .collection('users')
         .where('id', isEqualTo: firebaseUser.uid)
         .getDocuments();
     storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
       //update photoUrl
       final List<DocumentSnapshot> documents = result.documents;
-      Firestore.instance
+      FIRESTORE
           .collection('users')
           .document(firebaseUser.uid)
           .updateData({
@@ -442,7 +442,7 @@ class MyProfileState extends State<MyProfile> {
               ],
               flexibleSpace: FlexibleSpaceBar(
                 title: StreamBuilder(
-                  stream: Firestore.instance
+                  stream: FIRESTORE
                       .collection('users')
                       .where('id', isEqualTo: firebaseUser.uid)
                       .snapshots(),
@@ -458,7 +458,7 @@ class MyProfileState extends State<MyProfile> {
                   fit: StackFit.expand,
                   children: <Widget>[
                     StreamBuilder(
-                      stream: Firestore.instance
+                      stream: FIRESTORE
                           .collection('users')
                           .where('id', isEqualTo: firebaseUser.uid)
                           .snapshots(),
@@ -495,7 +495,7 @@ class MyProfileState extends State<MyProfile> {
             SliverList(
               delegate: SliverChildListDelegate(<Widget>[
                 StreamBuilder(
-                  stream: Firestore.instance
+                  stream: FIRESTORE
                       .collection('users')
                       .where('id', isEqualTo: firebaseUser.uid)
                       .snapshots(),

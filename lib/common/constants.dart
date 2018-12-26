@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 const HORIZONTAL = 0;
 const VERTICAL = 1;
@@ -22,6 +23,8 @@ const FOLLOWER = 'follower';
 const GGLOGIN = 'googleLogin';
 const EMAILLOGIN = 'emailLogin';
 const EMAILREG = 'emailReg';
+
+Firestore FIRESTORE;
 
 int TAB_INDEX = 0;
 bool NEW_MES = false;

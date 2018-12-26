@@ -70,14 +70,14 @@ class LoginAPI {
   static Future<void> saveUserToFirebase(FirebaseUser user) async {
     if (user != null) {
       // Check is already sign up
-      final QuerySnapshot result = await Firestore.instance
+      final QuerySnapshot result = await FIRESTORE
           .collection('users')
           .where('id', isEqualTo: user.uid)
           .getDocuments();
       final List<DocumentSnapshot> documents = result.documents;
       if (documents.length == 0) {
         // Update data to server if new user
-        Firestore.instance.collection('users').document(user.uid).setData({
+        FIRESTORE.collection('users').document(user.uid).setData({
           'nickName': user.displayName,
           'photoUrl': user.photoUrl,
           'id': user.uid,

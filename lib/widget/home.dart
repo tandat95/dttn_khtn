@@ -112,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //widget.user.uid
     final List<Widget> _children = [
       FutureBuilder(
-          future: Firestore.instance
+          future: FIRESTORE
               .collection('users')
               .document(CURRENT_USER.uid)
               .get(),
@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
               return new ListUser();
             } else {
               if (snapshot.data[FOLLOWING] == null) {
-                Firestore.instance
+                FIRESTORE
                     .collection('users')
                     .document(CURRENT_USER.uid)
                     .updateData({FOLLOWING: new List<String>()}).then((data) {

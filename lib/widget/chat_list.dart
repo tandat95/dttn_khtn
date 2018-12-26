@@ -191,7 +191,7 @@ class _ChatListState extends State<ChatList> {
             // List
             Container(
               child: StreamBuilder(
-                stream: Firestore.instance
+                stream: FIRESTORE
                     .collection("users")
                     .document(widget.currentUserId)
                     .collection('user_messages')
@@ -210,7 +210,7 @@ class _ChatListState extends State<ChatList> {
                       itemBuilder: (context, index) {
                         var messDoc = snapshot.data.documents[index];
                         return StreamBuilder(
-                          stream: Firestore.instance
+                          stream: FIRESTORE
                               .collection('users')
                               .document(messDoc.documentID)
                               .snapshots(),

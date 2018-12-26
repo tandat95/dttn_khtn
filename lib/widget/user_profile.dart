@@ -326,12 +326,12 @@ class UserProfileState extends State<UserProfile> {
     setState(() {
       _followed = !_followed;
     });
-    await Firestore.instance
+    await FIRESTORE
         .collection('users')
         .document(userId)
         .updateData({FOLLOWER: numFollow});
     print(FOLLOWED_LIST);
-    await Firestore.instance
+    await FIRESTORE
         .collection('users')
         .document(CURRENT_USER.uid)
         .updateData({FOLLOWING: FOLLOWED_LIST});
@@ -353,7 +353,7 @@ class UserProfileState extends State<UserProfile> {
     }
     return StreamBuilder(
       stream:
-          Firestore.instance.collection('users').document(userId).snapshots(),
+      FIRESTORE.collection('users').document(userId).snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(

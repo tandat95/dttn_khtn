@@ -3,12 +3,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dttn_khtn/common/constants.dart';
 import 'package:dttn_khtn/widget/user_profile.dart';
+
 class Choice {
-  const Choice({this.title, this.icon, this.isPaid});
+  const Choice({this.title, this.icon, @required this.mode});
 
   final String title;
-  final bool isPaid;
   final IconData icon;
+  final String mode; // 'ALL', 'FOLLOWING'
 }
 
 class ListUser extends StatelessWidget {
@@ -74,8 +75,8 @@ const List<Choice> choices = const <Choice>[
 //  const Choice(title: 'Top', icon: Icons.star_border),
 //  const Choice(title: 'All', icon: Icons.list),
 //  const Choice(title: 'Online', icon: Icons.network_wifi),
-  const Choice(title: 'All player', isPaid: false),
-  const Choice(title: 'Followed', isPaid: true),
+  const Choice(title: 'All player', mode: 'ALL'),
+  const Choice(title: 'Followed', mode: 'FOLLOWING'),
 ];
 
 class ChoiceCard extends StatelessWidget {
@@ -120,10 +121,14 @@ class ChoiceCard extends StatelessWidget {
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
+    if (choice.mode == 'FOllOWING') {
+      if (!FOLLOWED_LIST.contains(document['id'])) {
+        return null;
+      }
+    }
     return Container(
       child: FlatButton(
-        child:
-        Column(
+        child: Column(
           children: <Widget>[
             Row(
               children: <Widget>[
@@ -178,7 +183,9 @@ class ChoiceCard extends StatelessWidget {
                 loadGenderIcon(document),
               ],
             ),
-            Divider(height: 5,)
+            Divider(
+              height: 5,
+            )
           ],
         ),
 
@@ -187,7 +194,7 @@ class ChoiceCard extends StatelessWidget {
               context,
               new MaterialPageRoute(
                   builder: (context) => new UserProfile(
-                        userId: document['id'] ,
+                        userId: document['id'],
                         //followed: FOLLOWED_LIST.contains(document['id']),
                       )));
         },
@@ -195,33 +202,32 @@ class ChoiceCard extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
         shape: RoundedRectangleBorder(),
       ),
-     // margin: EdgeInsets.only(bottom: 3.0, left: 3.0, right: 3.0),
+      // margin: EdgeInsets.only(bottom: 3.0, left: 3.0, right: 3.0),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final TextStyle textStyle = Theme.of(context).textTheme.display1;
+
     return WillPopScope(
       child: Stack(
         children: <Widget>[
           // List
           Container(
             child: StreamBuilder(
-              stream: Firestore.instance.collection('users').snapshots(),
+              stream: FIRESTORE.collection('users').snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                    ),
-                  );
+                  return SET_LOADING();
                 } else {
                   return ListView.builder(
                     padding: EdgeInsets.all(10.0),
                     itemBuilder: (context, index) =>
                         buildItem(context, snapshot.data.documents[index]),
-                    itemCount: snapshot.data.documents.length,
+                    itemCount: choice.mode == 'FOllOWING'
+                        ? FOLLOWED_LIST.length
+                        : snapshot.data.documents.length,
                   );
                 }
               },

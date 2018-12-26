@@ -78,12 +78,14 @@ class ChatScreenState extends State<ChatScreen> {
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
-    id =CURRENT_USER.uid;
-    Firestore.instance
+    id = CURRENT_USER.uid;
+
+    FIRESTORE
         .collection('users')
         .document(id)
         .collection("user_messages")
-        .document(peerId).updateData({'unRead': false});
+        .document(peerId)
+        .updateData({'unRead': false});
     readLocal();
   }
 
@@ -151,10 +153,10 @@ class ChatScreenState extends State<ChatScreen> {
     if (content.trim() != '') {
       textEditingController.clear();
 
-      Firestore.instance.runTransaction((transaction) async {
+      FIRESTORE.runTransaction((transaction) async {
         //send to me
         await transaction.set(
-          Firestore.instance
+          FIRESTORE
               .collection('users')
               .document(id)
               .collection("user_messages")
@@ -171,7 +173,7 @@ class ChatScreenState extends State<ChatScreen> {
         );
         //send to friend
         await transaction.set(
-          Firestore.instance
+          FIRESTORE
               .collection('users')
               .document(peerId)
               .collection("user_messages")
@@ -188,11 +190,11 @@ class ChatScreenState extends State<ChatScreen> {
         );
         //set last message
         await transaction.set(
-          Firestore.instance
-            .collection('users')
-            .document(peerId)
-            .collection("user_messages")
-            .document(id),
+          FIRESTORE
+              .collection('users')
+              .document(peerId)
+              .collection("user_messages")
+              .document(id),
           {
             'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
             'lastContent': content,
@@ -201,7 +203,7 @@ class ChatScreenState extends State<ChatScreen> {
           },
         );
         await transaction.set(
-          Firestore.instance
+          FIRESTORE
               .collection('users')
               .document(id)
               .collection("user_messages")
@@ -587,8 +589,7 @@ class ChatScreenState extends State<ChatScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       ),
       decoration: new BoxDecoration(
-          border:
-              new Border(top: new BorderSide(color: subColor2, width: 0.5)),
+          border: new Border(top: new BorderSide(color: subColor2, width: 0.5)),
           color: Colors.white),
       padding: EdgeInsets.all(5.0),
       height: 180.0,
@@ -669,8 +670,7 @@ class ChatScreenState extends State<ChatScreen> {
       width: double.infinity,
       height: 50.0,
       decoration: new BoxDecoration(
-          border:
-              new Border(top: new BorderSide(color: subColor2, width: 0.5)),
+          border: new Border(top: new BorderSide(color: subColor2, width: 0.5)),
           color: Colors.white),
     );
   }
@@ -682,7 +682,7 @@ class ChatScreenState extends State<ChatScreen> {
               child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(themeColor)))
           : StreamBuilder(
-              stream: Firestore.instance
+              stream: FIRESTORE
                   .collection('users')
                   .document(id)
                   .collection('user_messages')
