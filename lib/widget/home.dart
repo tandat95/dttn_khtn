@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token) {
-      //print('token: $token');
+      print('token: $token');
     });
   }
 

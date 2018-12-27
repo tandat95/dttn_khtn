@@ -10,12 +10,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dttn_khtn/loginAPI.dart';
 
 class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
+  final String toPushId;
 
-  Chat({Key key, @required this.peerId, @required this.peerAvatar})
+  Chat({Key key, @required this.peerId, @required this.peerAvatar, this.toPushId})
       : super(key: key);
 
   @override
@@ -30,6 +32,7 @@ class Chat extends StatelessWidget {
       body: new ChatScreen(
         peerId: peerId,
         peerAvatar: peerAvatar,
+        toPushId: toPushId
       ),
     );
   }
@@ -38,21 +41,23 @@ class Chat extends StatelessWidget {
 class ChatScreen extends StatefulWidget {
   final String peerId;
   final String peerAvatar;
+  final String toPushId;
 
-  ChatScreen({Key key, @required this.peerId, @required this.peerAvatar})
+  ChatScreen({Key key, @required this.peerId, @required this.peerAvatar, this.toPushId})
       : super(key: key);
 
   @override
   State createState() =>
-      new ChatScreenState(peerId: peerId, peerAvatar: peerAvatar);
+      new ChatScreenState(peerId: peerId, peerAvatar: peerAvatar, toPushId: toPushId);
 }
 
 class ChatScreenState extends State<ChatScreen> {
-  ChatScreenState({Key key, @required this.peerId, @required this.peerAvatar});
+  ChatScreenState({Key key, @required this.peerId, @required this.peerAvatar, this.toPushId});
 
   String peerId;
   String peerAvatar;
   String id;
+  String toPushId;
 
   var listMessage;
   String groupChatId;
@@ -214,6 +219,18 @@ class ChatScreenState extends State<ChatScreen> {
             'type': type
           },
         );
+
+          FIRESTORE
+              .collection('users')
+              .document(id).get().then((snapshot){
+                var data = snapshot.data;
+                if(data!=null){
+                  var fromPushId  = data['pushId'];
+                  var title = data['nickName'];
+                  pushNotification(fromPushId, title, content, type);
+                }
+
+          });
       });
       setUnReadMesStatus(peerId, true);
       listScrollController.animateTo(0.0,
@@ -221,6 +238,17 @@ class ChatScreenState extends State<ChatScreen> {
     } else {
       Fluttertoast.showToast(msg: 'Nothing to send');
     }
+  }
+
+  void pushNotification(String fromPushId, String title, String content, int type){
+    if (type == 0) {
+      if (content.length > 25) content = content.substring(0, 25) + '...';
+    } else if (type == 1) {
+      content = 'image..';
+    } else if (type == 2) {
+      content = 'sticker..';
+    }
+    LoginAPI.sendNotification(toPushId, fromPushId, id, title, content);
   }
 
   Widget buildItem(int index, DocumentSnapshot document) {

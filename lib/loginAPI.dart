@@ -68,6 +68,7 @@ class LoginAPI {
   }
 
   static Future<void> saveUserToFirebase(FirebaseUser user) async {
+    var token = await _firebaseMessaging.getToken();
     if (user != null) {
       // Check is already sign up
       final QuerySnapshot result = await FIRESTORE
@@ -81,10 +82,11 @@ class LoginAPI {
           'nickName': user.displayName,
           'photoUrl': user.photoUrl,
           'id': user.uid,
+          'pushId': token
         });
       }
     }
-    var token = await _firebaseMessaging.getToken();
+
     var update = {
       'name': user.displayName,
       'photoUrl': user.photoUrl,
@@ -101,15 +103,10 @@ class LoginAPI {
         .child(user.uid)
         .update(update);
   }
-
-  static Future<void> sendNotification(User user) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var username = prefs.getString(USER_NAME);
-    var pushId = prefs.getString(PUSH_ID);
-    var userId = prefs.getString(USER_ID);
+  static Future<void> sendNotification(String toPushId, String fromPushId, String fromUid, String title, String text) async {
     var base = 'https://us-central1-testnotification-29624.cloudfunctions.net';
     String dataURL =
-        '$base/sendNotification2?to=${user.pushId}&fromPushId=$pushId&fromId=$userId&fromName=$username&type=invite';
+        '$base/sendNotification2?to=$toPushId&fromPushId=$fromPushId&fromId=$fromUid&title=$title&text=$text&type=invite';
     http.get(dataURL);
   }
 }

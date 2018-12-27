@@ -72,9 +72,6 @@ class ListUser extends StatelessWidget {
 }
 
 const List<Choice> choices = const <Choice>[
-//  const Choice(title: 'Top', icon: Icons.star_border),
-//  const Choice(title: 'All', icon: Icons.list),
-//  const Choice(title: 'Online', icon: Icons.network_wifi),
   const Choice(title: 'All player', mode: 'ALL'),
   const Choice(title: 'Followed', mode: 'FOLLOWING'),
 ];
@@ -121,11 +118,7 @@ class ChoiceCard extends StatelessWidget {
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
-    if (choice.mode == 'FOllOWING') {
-      if (!FOLLOWED_LIST.contains(document['id'])) {
-        return null;
-      }
-    }
+
     return Container(
       child: FlatButton(
         child: Column(
@@ -216,16 +209,29 @@ class ChoiceCard extends StatelessWidget {
           // List
           Container(
             child: StreamBuilder(
-              stream: FIRESTORE.collection('users').snapshots(),
+              stream: FIRESTORE
+                  .collection('users')
+                  .orderBy(FOLLOWER, descending: true)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return SET_LOADING();
                 } else {
+                 var documents = snapshot.data.documents;
+                 if(choice.mode == "FOLLOWING"){
+                   List<DocumentSnapshot> listDocument =new List();
+                   for (int i =0; i<documents.length; i++){
+                     if(FOLLOWED_LIST.contains(documents[i]['id'])){
+                       listDocument.add(documents[i]);
+                     }
+                   }
+                   documents = listDocument;
+                 }
                   return ListView.builder(
                     padding: EdgeInsets.all(10.0),
                     itemBuilder: (context, index) =>
-                        buildItem(context, snapshot.data.documents[index]),
-                    itemCount: choice.mode == 'FOllOWING'
+                        buildItem(context, documents[index]),
+                    itemCount: choice.mode == "FOLLOWING"
                         ? FOLLOWED_LIST.length
                         : snapshot.data.documents.length,
                   );

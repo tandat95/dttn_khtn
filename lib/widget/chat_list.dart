@@ -29,7 +29,9 @@ class _ChatListState extends State<ChatList> {
     var time = messageDoc['timestamp'];
     if (time != null) {
       int delta =
-          DateTime.now().millisecondsSinceEpoch - int.parse(time.toString());
+          DateTime
+              .now()
+              .millisecondsSinceEpoch - int.parse(time.toString());
       delta = (delta / 1000).floor();
       if (delta < 60) {
         return '$delta sec';
@@ -52,7 +54,7 @@ class _ChatListState extends State<ChatList> {
 
   Widget buildLastContent(messageDoc) {
     Color textColor = Colors.black26;
-    if (messageDoc['unRead']== true) {
+    if (messageDoc['unRead'] == true) {
       textColor = Colors.black87;
     }
     String content = messageDoc['lastContent'];
@@ -63,7 +65,7 @@ class _ChatListState extends State<ChatList> {
       } else if (type == 1) {
         content = 'image..';
       } else if (type == 2) {
-        content = 'ticker..';
+        content = 'sticker..';
       }
     }
     return Text(
@@ -139,10 +141,12 @@ class _ChatListState extends State<ChatList> {
           Navigator.push(
               context,
               new MaterialPageRoute(
-                  builder: (context) => new Chat(
-                        peerId: userDoc.documentID,
-                        peerAvatar: userDoc['photoUrl'],
-                      )));
+                  builder: (context) =>
+                  new Chat(
+                      peerId: userDoc.documentID,
+                      peerAvatar: userDoc['photoUrl'],
+                      toPushId: userDoc['pushId']
+                  )));
         },
         color: Colors.white,
         padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
@@ -219,7 +223,7 @@ class _ChatListState extends State<ChatList> {
                               return Center(
                                 child: RefreshProgressIndicator(
                                   valueColor:
-                                      AlwaysStoppedAnimation<Color>(themeColor),
+                                  AlwaysStoppedAnimation<Color>(themeColor),
                                 ),
                               );
                             } else {
@@ -257,13 +261,13 @@ class _ChatListState extends State<ChatList> {
             Positioned(
               child: isLoading
                   ? Container(
-                      child: Center(
-                        child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(themeColor)),
-                      ),
-                      color: Colors.white.withOpacity(0.8),
-                    )
+                child: Center(
+                  child: CircularProgressIndicator(
+                      valueColor:
+                      AlwaysStoppedAnimation<Color>(themeColor)),
+                ),
+                color: Colors.white.withOpacity(0.8),
+              )
                   : Container(),
             ),
           ],

@@ -393,6 +393,7 @@ class UserProfileState extends State<UserProfile> {
                             builder: (context) => new Chat(
                                   peerId: doc.documentID,
                                   peerAvatar: doc['photoUrl'],
+                                  toPushId: doc['pushId'],
                                 )));
                   },
                   heroTag: null,
