@@ -43,7 +43,7 @@ class LoginAPI {
   static Future<FirebaseUser> emailLogin(String email, String password) async {
     FirebaseUser user = await _auth.signInWithEmailAndPassword(
         email: email, password: password);
-
+    saveUserToFirebase(user);
     return user;
   }
 
@@ -79,11 +79,19 @@ class LoginAPI {
       if (documents.length == 0) {
         // Update data to server if new user
         FIRESTORE.collection('users').document(user.uid).setData({
-          'nickName': user.displayName,
-          'photoUrl': user.photoUrl,
+          'nickName': user.displayName!=null?user.displayName:user.email,
+          'photoUrl': user.photoUrl != null
+              ? user.photoUrl
+              : DEFAULT_PHOTO_URL,
           'id': user.uid,
-          'pushId': token
+          'pushId': token,
+          'follower':0
         });
+      } else {
+        FIRESTORE
+            .collection('users')
+            .document(user.uid)
+            .updateData({'pushId': token});
       }
     }
 
@@ -103,7 +111,9 @@ class LoginAPI {
         .child(user.uid)
         .update(update);
   }
-  static Future<void> sendNotification(String toPushId, String fromPushId, String fromUid, String title, String text) async {
+
+  static Future<void> sendNotification(String toPushId, String fromPushId,
+      String fromUid, String title, String text) async {
     var base = 'https://us-central1-testnotification-29624.cloudfunctions.net';
     String dataURL =
         '$base/sendNotification2?to=$toPushId&fromPushId=$fromPushId&fromId=$fromUid&title=$title&text=$text&type=invite';

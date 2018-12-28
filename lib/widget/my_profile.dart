@@ -33,134 +33,110 @@ class _GroupInfo extends StatelessWidget {
 
   List<String> _genders = <String>['--', 'Male', 'Female'];
 
+  Widget buildTextField(
+      label, iconData, initVal, onSave, inputType, maxLength, maxLine) {
+    return Container(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: TextFormField(
+        style: new TextStyle(color: Colors.black),
+        keyboardType: inputType,
+        decoration: InputDecoration(
+          prefixIcon: Icon(
+            iconData,
+            color: themeColor,
+          ),
+          labelText: label,
+          labelStyle: TextStyle(color: themeColor),
+          helperStyle: TextStyle(color: themeColor),
+          enabledBorder: const OutlineInputBorder(
+            borderSide: const BorderSide(color: themeColor, width: 0.5),
+            borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+          ),
+          border: const OutlineInputBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+          ),
+        ),
+        initialValue: initVal,
+        autocorrect: false,
+        maxLines: maxLine,
+        maxLength: maxLength,
+        onSaved: onSave,
+      ),
+    );
+  }
+
   List<Widget> _UserInfoForm() {
     return [
-      new TextFormField(
-        key: new Key('username'),
-        decoration: new InputDecoration(
-          labelText: 'Username',
-          icon: Icon(Icons.text_fields),
+      buildTextField('Username', Icons.person, user.userName, (val) {
+        user.userName = val;
+      }, TextInputType.text, null, 1),
+      buildTextField('Email', Icons.email, user.email, (val) {
+        user.email = val;
+      }, TextInputType.emailAddress, null, 1),
+      buildTextField('Phone', Icons.phone, user.phoneNumber, (val) {
+        user.phoneNumber = val;
+      }, TextInputType.phone, null, 1),
+      buildTextField('Age', Icons.cake, user.age, (val) {
+        user.age = val;
+      }, TextInputType.number, null, 1),
+      Container(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: new DropdownButtonFormField(
+          decoration: InputDecoration(
+            prefixIcon: Icon(
+              Icons.people,
+              color: themeColor,
+            ),
+            labelText: 'Gender',
+            labelStyle: TextStyle(color: themeColor),
+            helperStyle: TextStyle(color: themeColor),
+            enabledBorder: const OutlineInputBorder(
+              borderSide: const BorderSide(color: themeColor, width: 0.5),
+              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+            ),
+            border: const OutlineInputBorder(
+              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+            ),
+          ),
+          value: user.gender,
+          onChanged: (String newValue) {
+            user.gender = newValue;
+            //state.didChange(newValue);
+          },
+          items: _genders.map((String value) {
+            return new DropdownMenuItem(
+              value: value,
+              child: new Text(value),
+            );
+          }).toList(),
+          onSaved: (val) => user.gender = val,
         ),
-        initialValue: user.userName,
-        autocorrect: false,
-        onSaved: (val) => user.userName = val,
       ),
-      new TextFormField(
-        key: new Key('email'),
-        decoration: new InputDecoration(
-          labelText: 'Email',
-          icon: Icon(Icons.email),
-        ),
-        initialValue: user.email,
-        autocorrect: false,
-        onSaved: (val) => user.email = val,
-      ),
-      new TextFormField(
-        key: new Key('phone'),
-        keyboardType: TextInputType.number,
-        initialValue: user.phoneNumber,
-        decoration: new InputDecoration(
-          labelText: 'Phone number',
-          icon: Icon(Icons.phone),
-        ),
-        autocorrect: false,
-        onSaved: (val) => user.phoneNumber = val,
-      ),
-      new TextFormField(
-        key: new Key('age'),
-        keyboardType: TextInputType.number,
-        initialValue: user.age,
-        decoration: new InputDecoration(
-          labelText: 'Age',
-          icon: Icon(Icons.cake),
-        ),
-        autocorrect: false,
-        onSaved: (val) => user.age = val,
-      ),
-      new DropdownButtonFormField(
-        decoration: InputDecoration(
-          icon: const Icon(Icons.people),
-          labelText: 'Gender',
-        ),
-        value: user.gender,
-        onChanged: (String newValue) {
-          user.gender = newValue;
-          //state.didChange(newValue);
-        },
-        items: _genders.map((String value) {
-          return new DropdownMenuItem(
-            value: value,
-            child: new Text(value),
-          );
-        }).toList(),
-        onSaved: (val) => user.gender = val,
-      ),
-      new TextFormField(
-        decoration: new InputDecoration(
-          labelText: 'About you',
-          icon: Icon(Icons.info),
-        ),
-        initialValue: user.desciption,
-        keyboardType: TextInputType.multiline,
-        maxLines: 3,
-        maxLength: 100,
-        onSaved: (val) => user.desciption = val,
-      )
+      buildTextField('About you', Icons.info, user.desciption, (val) {
+        user.desciption = val;
+      }, TextInputType.multiline, 100, 3)
     ];
   }
 
   List<Widget> _GameInfoForm() {
     return [
-      new TextFormField(
-        key: new Key('lolname'),
-        decoration: new InputDecoration(
-          labelText: 'Nick "LOL"',
-          icon: Icon(Icons.games),
-        ),
-        autocorrect: false,
-        initialValue: user.lolName,
-        onSaved: (val) => user.lolName = val,
-      ),
-      new TextFormField(
-        key: new Key('pupgname'),
-        initialValue: user.pupgName,
-        decoration: new InputDecoration(
-          labelText: 'Nick "PUPG"',
-          icon: Icon(Icons.games),
-        ),
-        autocorrect: false,
-        onSaved: (val) => user.pupgName = val,
-      ),
-      new TextFormField(
-        key: new Key('rosname'),
-        initialValue: user.rosName,
-        decoration: new InputDecoration(
-          labelText: 'Nick "Rules Of Survival"',
-          icon: Icon(Icons.games),
-        ),
-        autocorrect: false,
-        onSaved: (val) => user.rosName = val,
-      ),
-      new TextFormField(
-        key: new Key('sokname'),
-        initialValue: user.sokName,
-        decoration: new InputDecoration(
-          labelText: 'Nick "Strike of Kings (LQMB)"',
-          icon: Icon(Icons.games),
-        ),
-        autocorrect: false,
-        onSaved: (val) => user.sokName = val,
-      ),
-      new TextFormField(
-        key: new Key('fifaname'),
-        initialValue: user.fifaName,
-        decoration: new InputDecoration(
-          labelText: 'Nick "Fifa online"',
-          icon: Icon(Icons.games),
-        ),
-        autocorrect: false,
-        onSaved: (val) => user.fifaName = val,
-      )
+      buildTextField('Nick LOL', Icons.games, user.lolName, (val) {
+        user.lolName = val;
+      }, TextInputType.text, null, 1),
+      buildTextField('Nick PUPG', Icons.games, user.pupgName, (val) {
+        user.pupgName = val;
+      }, TextInputType.text, null, 1),
+      buildTextField('Nick Rules Of Survival', Icons.games, user.rosName,
+          (val) {
+        user.rosName = val;
+      }, TextInputType.text, null, 1),
+      buildTextField('Nick Strike of Kings (LQMB)', Icons.games, user.sokName,
+          (val) {
+        user.sokName = val;
+      }, TextInputType.text, null, 1),
+      buildTextField('Nick FIFA Online', Icons.games, user.fifaName, (val) {
+        user.fifaName = val;
+      }, TextInputType.text, null, 1),
     ];
   }
 
@@ -328,10 +304,7 @@ class MyProfileState extends State<MyProfile> {
     storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
       //update photoUrl
       final List<DocumentSnapshot> documents = result.documents;
-      FIRESTORE
-          .collection('users')
-          .document(firebaseUser.uid)
-          .updateData({
+      FIRESTORE.collection('users').document(firebaseUser.uid).updateData({
         'photoUrl': downloadUrl,
       });
       setState(() {

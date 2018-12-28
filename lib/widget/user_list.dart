@@ -118,85 +118,75 @@ class ChoiceCard extends StatelessWidget {
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
-
-    return Container(
-      child: FlatButton(
-        child: Column(
-          children: <Widget>[
-            Row(
+    return Card(
+      elevation: 2.0,
+      margin: new EdgeInsets.symmetric(horizontal: 3.0, vertical: 2.0),
+      child: Container(
+        //decoration: BoxDecoration(color: Color.fromRGBO(64, 75, 96, .9)),
+        child: Container(
+          child: ListTile(
+            leading: Material(
+              child: CachedNetworkImage(
+                placeholder: Container(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1.0,
+                    valueColor: AlwaysStoppedAnimation<Color>(themeColor),
+                  ),
+                  width: 60.0,
+                  height: 60.0,
+                  padding: EdgeInsets.all(15.0),
+                ),
+                imageUrl: document['photoUrl'],
+                width: 60.0,
+                height: 60.0,
+                fit: BoxFit.cover,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(25.0)),
+              clipBehavior: Clip.hardEdge,
+            ),
+            title: new Container(
+              child: Text(
+                '${document['nickName']}',
+                style: TextStyle(
+                    color: titleColorH2,
+                    //fontWeight: FontWeight.bold,
+                    fontSize: 16),
+              ),
+              alignment: Alignment.centerLeft,
+              margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+            ),
+            subtitle: Column(
               children: <Widget>[
-                Material(
-                  child: CachedNetworkImage(
-                    placeholder: Container(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 1.0,
-                        valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                      ),
-                      width: 60.0,
-                      height: 60.0,
-                      padding: EdgeInsets.all(15.0),
-                    ),
-                    imageUrl: document['photoUrl'],
-                    width: 60.0,
-                    height: 60.0,
-                    fit: BoxFit.cover,
+                new Container(
+                  child: Text(
+                    '${document['aboutMe'] ?? '--'}',
+                    style: TextStyle(color: subColor1),
                   ),
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  clipBehavior: Clip.hardEdge,
+                  alignment: Alignment.centerLeft,
+                  margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
                 ),
-                new Flexible(
-                  child: Container(
-                    child: new Column(
-                      children: <Widget>[
-                        new Container(
-                          child: Text(
-                            '${document['nickName']}',
-                            style: TextStyle(
-                                color: titleColorH2,
-                                //fontWeight: FontWeight.bold,
-                                fontSize: 16),
-                          ),
-                          alignment: Alignment.centerLeft,
-                          margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
-                        ),
-                        new Container(
-                          child: Text(
-                            '${document['aboutMe'] ?? '--'}',
-                            style: TextStyle(color: subColor1),
-                          ),
-                          alignment: Alignment.centerLeft,
-                          margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                        ),
-                        buildGameInfo(document)
-                      ],
-                    ),
-                    margin: EdgeInsets.only(left: 20.0),
-                  ),
-                ),
-                loadGenderIcon(document),
+                buildGameInfo(document)
               ],
             ),
-            Divider(
-              height: 5,
-            )
-          ],
-        ),
+            trailing: loadGenderIcon(document),
+            isThreeLine: true,
 
-        onPressed: () {
-          Navigator.push(
-              context,
-              new MaterialPageRoute(
-                  builder: (context) => new UserProfile(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  new MaterialPageRoute(
+                      builder: (context) => new UserProfile(
                         userId: document['id'],
                         //followed: FOLLOWED_LIST.contains(document['id']),
                       )));
-        },
-        //color: subColor2,
-        padding: EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
-        shape: RoundedRectangleBorder(),
+            },
+            //color: subColor2,
+          ),
+          // margin: EdgeInsets.only(bottom: 3.0, left: 3.0, right: 3.0),
+        ),
       ),
-      // margin: EdgeInsets.only(bottom: 3.0, left: 3.0, right: 3.0),
     );
+
   }
 
   @override
@@ -217,16 +207,16 @@ class ChoiceCard extends StatelessWidget {
                 if (!snapshot.hasData) {
                   return SET_LOADING();
                 } else {
-                 var documents = snapshot.data.documents;
-                 if(choice.mode == "FOLLOWING"){
-                   List<DocumentSnapshot> listDocument =new List();
-                   for (int i =0; i<documents.length; i++){
-                     if(FOLLOWED_LIST.contains(documents[i]['id'])){
-                       listDocument.add(documents[i]);
-                     }
-                   }
-                   documents = listDocument;
-                 }
+                  var documents = snapshot.data.documents;
+                  if (choice.mode == "FOLLOWING") {
+                    List<DocumentSnapshot> listDocument = new List();
+                    for (int i = 0; i < documents.length; i++) {
+                      if (FOLLOWED_LIST.contains(documents[i]['id'])) {
+                        listDocument.add(documents[i]);
+                      }
+                    }
+                    documents = listDocument;
+                  }
                   return ListView.builder(
                     padding: EdgeInsets.all(10.0),
                     itemBuilder: (context, index) =>

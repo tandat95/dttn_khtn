@@ -45,129 +45,54 @@ class _GroupInfo extends StatelessWidget {
     return _userInfo;
   }
 
+  Widget buildTextField(
+      label, iconData, initVal, maxLength, maxLine) {
+    return Container(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: TextFormField(
+        enabled: false,
+        style: new TextStyle(color: Colors.black),
+        decoration: InputDecoration(
+          prefixIcon: Icon(
+            iconData,
+            color: themeColor,
+          ),
+          labelText: label,
+          labelStyle: TextStyle(color: themeColor),
+          helperStyle: TextStyle(color: themeColor),
+          enabledBorder: const OutlineInputBorder(
+            borderSide: const BorderSide(color: themeColor, width: 0.5),
+            borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+          ),
+          border: const OutlineInputBorder(
+            borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+          ),
+        ),
+        initialValue: initVal,
+        autocorrect: false,
+        maxLines: maxLine,
+        maxLength: maxLength,
+      ),
+    );
+  }
+
   List<Widget> _UserInfoForm() {
     return [
-      new TextFormField(
-        enabled: false,
-        key: new Key('aboutMe'),
-        maxLines: 3,
-        decoration: new InputDecoration(
-          labelText: 'Description',
-          icon: Icon(Icons.info),
-        ),
-        initialValue: document['aboutMe'],
-        autocorrect: false,
-      ),
-      new TextFormField(
-        enabled: false,
-        key: new Key('username'),
-        decoration: new InputDecoration(
-          labelText: 'Username',
-          icon: Icon(Icons.text_fields),
-        ),
-        initialValue: document['nickName'],
-        autocorrect: false,
-      ),
-      new TextFormField(
-        enabled: false,
-        key: new Key('email'),
-        decoration: new InputDecoration(
-          labelText: 'Email',
-          icon: Icon(Icons.email),
-        ),
-        initialValue: document['email'],
-        autocorrect: false,
-      ),
-      new TextFormField(
-        enabled: false,
-        key: new Key('phoneNumber'),
-        keyboardType: TextInputType.number,
-        initialValue: document['phoneNumber'],
-        decoration: new InputDecoration(
-          labelText: 'Phone number',
-          icon: Icon(Icons.phone),
-        ),
-        autocorrect: false,
-      ),
-      new TextFormField(
-        enabled: false,
-        key: new Key('age'),
-        keyboardType: TextInputType.number,
-        initialValue: document['age'],
-        decoration: new InputDecoration(
-          labelText: 'Age',
-          icon: Icon(Icons.cake),
-        ),
-        autocorrect: false,
-      ),
-      new TextFormField(
-        enabled: false,
-        key: new Key('Gender'),
-        keyboardType: TextInputType.number,
-        initialValue: document['gender'],
-        decoration: new InputDecoration(
-          labelText: 'Gender',
-          icon: Icon(Icons.people),
-        ),
-        autocorrect: false,
-      ),
+      buildTextField('Description',Icons.info, document['aboutMe'],null, 3),
+      buildTextField('Email',Icons.email, document['email'],null, 1),
+      buildTextField('Phone',Icons.phone, document['phoneNumber'],null, 1),
+      buildTextField('Age',Icons.cake, document['age'],null, 1),
+      buildTextField('Gender',Icons.people, document['gender'],null, 1)
     ];
   }
 
   List<Widget> _GameInfoForm() {
     return [
-      new TextFormField(
-        enabled: false,
-        key: new Key('lolName'),
-        decoration: new InputDecoration(
-          labelText: 'Nick "LOL"',
-          icon: Icon(Icons.games),
-        ),
-        autocorrect: false,
-        initialValue: document['lolName'],
-      ),
-      new TextFormField(
-        enabled: false,
-        key: new Key('pupgName'),
-        initialValue: document['pupgName'],
-        decoration: new InputDecoration(
-          labelText: 'Nick "PUPG"',
-          icon: Icon(Icons.games),
-        ),
-        autocorrect: false,
-      ),
-      new TextFormField(
-        enabled: false,
-        key: new Key('rosName'),
-        initialValue: document['rosName'],
-        decoration: new InputDecoration(
-          labelText: 'Nick "Rules Of Survival"',
-          icon: Icon(Icons.games),
-        ),
-        autocorrect: false,
-      ),
-      new TextFormField(
-        enabled: false,
-        key: new Key('sokName'),
-        initialValue: document['sokName'],
-        keyboardType: TextInputType.number,
-        decoration: new InputDecoration(
-          labelText: 'Nick "Strike of Kings (LQMB)"',
-          icon: Icon(Icons.games),
-        ),
-        autocorrect: false,
-      ),
-      new TextFormField(
-        enabled: false,
-        key: new Key('fifaName'),
-        initialValue: document['fifaName'],
-        keyboardType: TextInputType.number,
-        decoration: new InputDecoration(
-          labelText: 'Nick "Fifa online"',
-          icon: Icon(Icons.games),
-        ),
-        autocorrect: false,
-      )
+      buildTextField('Nick LOL', Icons.games, document['lolName'],  null, 1),
+      buildTextField('Nick PUPG', Icons.games, document['pupgName'],  null, 1),
+      buildTextField('Nick Rules Of Survival', Icons.games, document['rosName'], null, 1),
+      buildTextField('Nick Strike of Kings (LQMB)', Icons.games, document['sokName'], null, 1),
+      buildTextField('Nick FIFA Online', Icons.games, document['fifaName'],  null, 1),
     ];
   }
 
@@ -326,12 +251,12 @@ class UserProfileState extends State<UserProfile> {
     setState(() {
       _followed = !_followed;
     });
-    await FIRESTORE
+     FIRESTORE
         .collection('users')
         .document(userId)
         .updateData({FOLLOWER: numFollow});
     print(FOLLOWED_LIST);
-    await FIRESTORE
+     FIRESTORE
         .collection('users')
         .document(CURRENT_USER.uid)
         .updateData({FOLLOWING: FOLLOWED_LIST});

@@ -23,6 +23,10 @@ const FOLLOWER = 'follower';
 const GGLOGIN = 'googleLogin';
 const EMAILLOGIN = 'emailLogin';
 const EMAILREG = 'emailReg';
+const DEFAULT_PHOTO_URL = "https://firebasestorage.googleapis.com/v0/b/testnotification-29624.appspot.com/o/avatar_default.png?alt=media&token=d21ab19e-17a9-4746-bf57-edd1aca8916a";
+const UNKNOW_USER = 'Unknow user';
+const USER_NOT_EXIST = 'User not exist!';
+const NOTHING_TO_SEND = 'Nothing to send!';
 
 Firestore FIRESTORE;
 
@@ -33,7 +37,7 @@ List<String> FOLLOWED_LIST = new List();
 FirebaseUser CURRENT_USER;
 
 final MaterialColor primaryColor = Colors.deepOrange;
-final MaterialColor themeColor = Colors.deepOrange;
+const Color themeColor = Colors.deepOrange;
 
 final subColor1 = new Color(0xffaeaeae);
 final subColor2 = new Color(0xffE8E8E8);

@@ -34,6 +34,7 @@ class _ChatListState extends State<ChatList> {
               .millisecondsSinceEpoch - int.parse(time.toString());
       delta = (delta / 1000).floor();
       if (delta < 60) {
+        if(delta<0) delta = 0;
         return '$delta sec';
       } else if (delta / 60 < 60) {
         delta = (delta / 60).floor();
@@ -70,87 +71,77 @@ class _ChatListState extends State<ChatList> {
     }
     return Text(
       content,
-      style: TextStyle(color: textColor, fontSize: 13),
+      style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.bold),
     );
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot userDoc,
       DocumentSnapshot messageDoc) {
+    var photoUrl = userDoc['photoUrl']!=null? userDoc['photoUrl']: DEFAULT_PHOTO_URL;
+    var nickName = userDoc['nickName']!=null?userDoc['nickName']: UNKNOW_USER;
     return Container(
-      child: FlatButton(
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Material(
-                  child: CachedNetworkImage(
-                    placeholder: Container(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 1.0,
-                        valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                      ),
-                      width: 50.0,
-                      height: 50.0,
-                      padding: EdgeInsets.all(15.0),
-                    ),
-                    imageUrl: userDoc['photoUrl'],
-                    width: 50.0,
-                    height: 50.0,
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                  clipBehavior: Clip.hardEdge,
+      child: ListTile(
+        leading:Container(
+          child: Material(
+            child: CachedNetworkImage(
+              placeholder: Container(
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.0,
+                  valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                 ),
-                new Flexible(
-                  child: Container(
-                    child: new Column(
-                      children: <Widget>[
-                        new Container(
-                          child: Text(
-                            userDoc['nickName'],
-                            style: TextStyle(
-                                color: Colors.black87,
-                                //fontWeight: FontWeight.bold,
-                                fontSize: 16),
-                          ),
-                          alignment: Alignment.centerLeft,
-                          margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
-                        ),
-                        new Container(
-                          child: buildLastContent(messageDoc),
-                          alignment: Alignment.centerLeft,
-                          margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                        )
-                      ],
-                    ),
-                    margin: EdgeInsets.only(left: 20.0),
-                  ),
-                ),
-                Text(
-                  buildLastTime(messageDoc),
-                  style: TextStyle(fontSize: 12),
-                )
-              ],
+                width: 50.0,
+                height: 50.0,
+                padding: EdgeInsets.all(15.0),
+              ),
+              imageUrl: photoUrl,
+              width: 50.0,
+              height: 50.0,
+              fit: BoxFit.cover,
             ),
-            Divider(
-              height: 5,
-            ),
-          ],
+            borderRadius: BorderRadius.all(Radius.circular(25.0)),
+            clipBehavior: Clip.hardEdge,
+          ),
+//          padding: EdgeInsets.only(right: 12.0),
+//          decoration: new BoxDecoration(
+//              border: new Border(
+//                  right: new BorderSide(width: 1.0, color: Colors.black26))),
         ),
-        onPressed: () {
+
+      title:  new Container(
+        child: Text(
+          nickName,
+          style: TextStyle(
+              color: Colors.black87,
+              //fontWeight: FontWeight.bold,
+              fontSize: 16),
+        ),
+        alignment: Alignment.centerLeft,
+        margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
+      ),
+        subtitle: new Container(
+          child: buildLastContent(messageDoc),
+          alignment: Alignment.centerLeft,
+          margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
+        ),
+        trailing: Text(
+          buildLastTime(messageDoc),
+          style: TextStyle(fontSize: 12),
+        ),
+
+        onTap: () {
           Navigator.push(
               context,
               new MaterialPageRoute(
                   builder: (context) =>
                   new Chat(
                       peerId: userDoc.documentID,
-                      peerAvatar: userDoc['photoUrl'],
+                      peerAvatar: photoUrl,
                       toPushId: userDoc['pushId']
                   )));
         },
-        color: Colors.white,
-        padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-        shape: RoundedRectangleBorder(),
+//        color: Colors.white,
+//        padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
+//        shape: RoundedRectangleBorder(),
       ),
       //margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
     );

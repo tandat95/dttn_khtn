@@ -11,13 +11,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dttn_khtn/loginAPI.dart';
+import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 
 class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
   final String toPushId;
 
-  Chat({Key key, @required this.peerId, @required this.peerAvatar, this.toPushId})
+  Chat(
+      {Key key,
+      @required this.peerId,
+      @required this.peerAvatar,
+      this.toPushId})
       : super(key: key);
 
   @override
@@ -30,10 +35,7 @@ class Chat extends StatelessWidget {
         //centerTitle: true,
       ),
       body: new ChatScreen(
-        peerId: peerId,
-        peerAvatar: peerAvatar,
-        toPushId: toPushId
-      ),
+          peerId: peerId, peerAvatar: peerAvatar, toPushId: toPushId),
     );
   }
 }
@@ -43,23 +45,31 @@ class ChatScreen extends StatefulWidget {
   final String peerAvatar;
   final String toPushId;
 
-  ChatScreen({Key key, @required this.peerId, @required this.peerAvatar, this.toPushId})
+  ChatScreen(
+      {Key key,
+      @required this.peerId,
+      @required this.peerAvatar,
+      this.toPushId})
       : super(key: key);
 
   @override
-  State createState() =>
-      new ChatScreenState(peerId: peerId, peerAvatar: peerAvatar, toPushId: toPushId);
+  State createState() => new ChatScreenState(
+      peerId: peerId, peerAvatar: peerAvatar, toPushId: toPushId);
 }
 
 class ChatScreenState extends State<ChatScreen> {
-  ChatScreenState({Key key, @required this.peerId, @required this.peerAvatar, this.toPushId});
+  ChatScreenState(
+      {Key key,
+      @required this.peerId,
+      @required this.peerAvatar,
+      this.toPushId});
 
   String peerId;
   String peerAvatar;
   String id;
   String toPushId;
 
-  var listMessage;
+  var listMessage =[];
   String groupChatId;
   SharedPreferences prefs;
 
@@ -67,6 +77,9 @@ class ChatScreenState extends State<ChatScreen> {
   bool isLoading;
   bool isShowSticker;
   String imageUrl;
+
+  var lastMessage;
+  var query;
 
   final TextEditingController textEditingController =
       new TextEditingController();
@@ -76,6 +89,7 @@ class ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    //listScrollController.addListener(scrollToEnd);
     focusNode.addListener(onFocusChange);
 
     groupChatId = '';
@@ -85,6 +99,14 @@ class ChatScreenState extends State<ChatScreen> {
     imageUrl = '';
     id = CURRENT_USER.uid;
 
+    query = FIRESTORE
+        .collection('users')
+        .document(id)
+        .collection('user_messages')
+        .document(widget.peerId)
+        .collection(widget.peerId)
+        .orderBy('timestamp', descending: true)
+        .limit(20);
     FIRESTORE
         .collection('users')
         .document(id)
@@ -154,93 +176,94 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   void onSendMessage(String content, int type) {
-    // type: 0 = text, 1 = image, 2 = sticker
-    if (content.trim() != '') {
-      textEditingController.clear();
+    if (peerId != null) {
+      // type: 0 = text, 1 = image, 2 = sticker
+      if (content.trim() != '') {
+        textEditingController.clear();
+        FIRESTORE.runTransaction((transaction) async {
+          //send to me
+          await transaction.set(
+            FIRESTORE
+                .collection('users')
+                .document(id)
+                .collection("user_messages")
+                .document(peerId)
+                .collection(peerId)
+                .document(DateTime.now().millisecondsSinceEpoch.toString()),
+            {
+              'idFrom': id,
+              'idTo': peerId,
+              'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+              'content': content,
+              'type': type
+            },
+          );
+          //send to friend
+          await transaction.set(
+            FIRESTORE
+                .collection('users')
+                .document(peerId)
+                .collection("user_messages")
+                .document(id)
+                .collection(id)
+                .document(DateTime.now().millisecondsSinceEpoch.toString()),
+            {
+              'idFrom': id,
+              'idTo': peerId,
+              'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+              'content': content,
+              'type': type
+            },
+          );
+          //set last message
+          await transaction.set(
+            FIRESTORE
+                .collection('users')
+                .document(peerId)
+                .collection("user_messages")
+                .document(id),
+            {
+              'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+              'lastContent': content,
+              'type': type,
+              'unRead': true
+            },
+          );
+          await transaction.set(
+            FIRESTORE
+                .collection('users')
+                .document(id)
+                .collection("user_messages")
+                .document(peerId),
+            {
+              'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+              'lastContent': content,
+              'type': type
+            },
+          );
 
-      FIRESTORE.runTransaction((transaction) async {
-        //send to me
-        await transaction.set(
-          FIRESTORE
-              .collection('users')
-              .document(id)
-              .collection("user_messages")
-              .document(peerId)
-              .collection(peerId)
-              .document(DateTime.now().millisecondsSinceEpoch.toString()),
-          {
-            'idFrom': id,
-            'idTo': peerId,
-            'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
-            'content': content,
-            'type': type
-          },
-        );
-        //send to friend
-        await transaction.set(
-          FIRESTORE
-              .collection('users')
-              .document(peerId)
-              .collection("user_messages")
-              .document(id)
-              .collection(id)
-              .document(DateTime.now().millisecondsSinceEpoch.toString()),
-          {
-            'idFrom': id,
-            'idTo': peerId,
-            'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
-            'content': content,
-            'type': type
-          },
-        );
-        //set last message
-        await transaction.set(
-          FIRESTORE
-              .collection('users')
-              .document(peerId)
-              .collection("user_messages")
-              .document(id),
-          {
-            'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
-            'lastContent': content,
-            'type': type,
-            'unRead': true
-          },
-        );
-        await transaction.set(
-          FIRESTORE
-              .collection('users')
-              .document(id)
-              .collection("user_messages")
-              .document(peerId),
-          {
-            'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
-            'lastContent': content,
-            'type': type
-          },
-        );
-
-          FIRESTORE
-              .collection('users')
-              .document(id).get().then((snapshot){
-                var data = snapshot.data;
-                if(data!=null){
-                  var fromPushId  = data['pushId'];
-                  var title = data['nickName'];
-                  pushNotification(fromPushId, title, content, type);
-                }
-
+          FIRESTORE.collection('users').document(id).get().then((snapshot) {
+            var data = snapshot.data;
+            if (data != null) {
+              var fromPushId = data['pushId'];
+              var title = data['nickName'];
+              pushNotification(fromPushId, title, content, type);
+            }
           });
-      });
-      setUnReadMesStatus(peerId, true);
-      listScrollController.animateTo(0.0,
-          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+        });
+        setUnReadMesStatus(peerId, true);
+        listScrollController.animateTo(0.0,
+            duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+      } else {
+        Fluttertoast.showToast(msg: NOTHING_TO_SEND);
+      }
     } else {
-      Fluttertoast.showToast(msg: 'Nothing to send');
+      Fluttertoast.showToast(msg: USER_NOT_EXIST);
     }
   }
 
-  void pushNotification(String fromPushId, String title, String content, int type){
+  void pushNotification(
+      String fromPushId, String title, String content, int type) {
     if (type == 0) {
       if (content.length > 25) content = content.substring(0, 25) + '...';
     } else if (type == 1) {
@@ -703,6 +726,23 @@ class ChatScreenState extends State<ChatScreen> {
     );
   }
 
+//  void scrollToEnd() {
+//    if (listScrollController.position.pixels ==
+//        listScrollController.position.maxScrollExtent) {
+//      setState(() {
+//        query = query = FIRESTORE
+//            .collection('users')
+//            .document(id)
+//            .collection('user_messages')
+//            .document(widget.peerId)
+//            .collection(widget.peerId)
+//            .orderBy('timestamp', descending: true)
+//            .startAfter([lastMessage['timestamp']])
+//            .limit(15);
+//      });
+//    }
+//  }
+
   Widget buildListMessage() {
     return Flexible(
       child: groupChatId == ''
@@ -717,20 +757,19 @@ class ChatScreenState extends State<ChatScreen> {
                   .document(widget.peerId)
                   .collection(widget.peerId)
                   .orderBy('timestamp', descending: true)
-                  .snapshots(),
+                  .limit(50).snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return Center(
-                      child: CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(themeColor)));
+                  return SET_LOADING();
                 } else {
-                  listMessage = snapshot.data.documents;
+                  listMessage=snapshot.data.documents;
+                  //listMessage =listMessage..addAll(snapshot.data.documents);
+                  //lastMessage = listMessage[listMessage.length - 1];
                   return ListView.builder(
                     padding: EdgeInsets.all(10.0),
                     itemBuilder: (context, index) =>
-                        buildItem(index, snapshot.data.documents[index]),
-                    itemCount: snapshot.data.documents.length,
+                        buildItem(index, listMessage[index]),
+                    itemCount: listMessage.length,
                     reverse: true,
                     controller: listScrollController,
                   );
