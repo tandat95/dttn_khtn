@@ -60,8 +60,8 @@ class _GroupInfo extends StatelessWidget {
           labelText: label,
           labelStyle: TextStyle(color: themeColor),
           helperStyle: TextStyle(color: themeColor),
-          enabledBorder: const OutlineInputBorder(
-            borderSide: const BorderSide(color: themeColor, width: 0.5),
+          enabledBorder:  OutlineInputBorder(
+            borderSide:  BorderSide(color: themeColor, width: 0.5),
             borderRadius: const BorderRadius.all(Radius.circular(10.0)),
           ),
           border: const OutlineInputBorder(
@@ -319,6 +319,7 @@ class UserProfileState extends State<UserProfile> {
                                   peerId: doc.documentID,
                                   peerAvatar: doc['photoUrl'],
                                   toPushId: doc['pushId'],
+                                  title: doc['nickName'],
                                 )));
                   },
                   heroTag: null,

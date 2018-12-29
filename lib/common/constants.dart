@@ -36,8 +36,7 @@ List<String> FOLLOWED_LIST = new List();
 
 FirebaseUser CURRENT_USER;
 
-final MaterialColor primaryColor = Colors.deepOrange;
-const Color themeColor = Colors.deepOrange;
+Color themeColor = Colors.blue;
 
 final subColor1 = new Color(0xffaeaeae);
 final subColor2 = new Color(0xffE8E8E8);

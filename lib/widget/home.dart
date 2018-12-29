@@ -8,6 +8,7 @@ import 'package:dttn_khtn/widget/my_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dttn_khtn/common/constants.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:dttn_khtn/widget/setting.dart';
 import 'package:dttn_khtn/widget/make_money.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -112,10 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
     //widget.user.uid
     final List<Widget> _children = [
       FutureBuilder(
-          future: FIRESTORE
-              .collection('users')
-              .document(CURRENT_USER.uid)
-              .get(),
+          future:
+              FIRESTORE.collection('users').document(CURRENT_USER.uid).get(),
           builder: (context, snapshot) {
             if (!(snapshot.connectionState == ConnectionState.done)) {
               //return SET_LOADING();
@@ -125,8 +124,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 FIRESTORE
                     .collection('users')
                     .document(CURRENT_USER.uid)
-                    .updateData({FOLLOWING: new List<String>()}).then((data) {
-                });
+                    .updateData({FOLLOWING: new List<String>()}).then(
+                        (data) {});
               } else {
                 FOLLOWED_LIST = new List<String>();
                 for (int i = 0; i < snapshot.data[FOLLOWING].length; i++) {
@@ -140,6 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
         currentUserId: widget.user.uid,
       ),
       new MyProfile(user: widget.user),
+      new Setting(onSignout: widget.onSignOut,)
       //new MakeMoney()
     ];
     return Scaffold(
@@ -147,9 +147,9 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
             // sets the background color of the `BottomNavigationBar`
-            canvasColor: Colors.white,
+            canvasColor: themeColor,
             // sets the active color of the `BottomNavigationBar` if `Brightness` is light
-            //primaryColor: Colors.red,
+            primaryColor: Colors.red,
             textTheme: Theme.of(context).textTheme.copyWith()),
         child: BottomNavigationBar(
           onTap: onTabTapped,
@@ -165,6 +165,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             BottomNavigationBarItem(
                 icon: Icon(Icons.person), title: Text('Profile')),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.settings), title: Text('Setting')),
 //              BottomNavigationBarItem(
 //                  icon: Icon(Icons.attach_money),
 //                  title: Text('Make money')

@@ -79,13 +79,11 @@ class LoginAPI {
       if (documents.length == 0) {
         // Update data to server if new user
         FIRESTORE.collection('users').document(user.uid).setData({
-          'nickName': user.displayName!=null?user.displayName:user.email,
-          'photoUrl': user.photoUrl != null
-              ? user.photoUrl
-              : DEFAULT_PHOTO_URL,
+          'nickName': user.displayName != null ? user.displayName : user.email,
+          'photoUrl': user.photoUrl != null ? user.photoUrl : DEFAULT_PHOTO_URL,
           'id': user.uid,
           'pushId': token,
-          'follower':0
+          'follower': 0
         });
       } else {
         FIRESTORE

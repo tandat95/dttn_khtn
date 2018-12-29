@@ -31,6 +31,7 @@ class ListUser extends StatelessWidget {
                 children: <Widget>[
                   new Expanded(child: new Container()),
                   TabBar(
+                    indicatorColor: Colors.white,
                     isScrollable: true,
                     tabs: choices.map((Choice choice) {
                       return Tab(
@@ -44,20 +45,6 @@ class ListUser extends StatelessWidget {
             ),
           ),
         ),
-
-//        appBar: AppBar(
-//
-//          //title: const Text('List player'),
-//          bottom: TabBar(
-//            isScrollable: true,
-//            tabs: choices.map((Choice choice) {
-//              return Tab(
-//                text: choice.title,
-//                //icon: Icon(choice.icon),
-//              );
-//            }).toList(),
-//          ),
-//        ),
         body: TabBarView(
           children: choices.map((Choice choice) {
             return Padding(
@@ -110,7 +97,7 @@ class ChoiceCard extends StatelessWidget {
     return Container(
       child: Text(
         'Games: ${strGame ?? '--'}',
-        style: TextStyle(color: primaryColor),
+        style: TextStyle(color: themeColor),
       ),
       alignment: Alignment.centerLeft,
       margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),

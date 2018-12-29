@@ -15,15 +15,20 @@ class ChatList extends StatefulWidget {
 }
 
 class _ChatListState extends State<ChatList> {
-//  MainScreenState({Key key, @required this.currentUserId});
-//
-//  final String currentUserId;
+
 
   bool isLoading = false;
+  Color appbarColor;
   List<Choice> choices = const <Choice>[
     const Choice(title: 'Delete message', icon: Icons.delete),
     //const Choice(title: 'Log out', icon: Icons.exit_to_app),
   ];
+
+
+  @override
+  void initState() {
+    appbarColor = themeColor;
+  }
 
   String buildLastTime(messageDoc) {
     var time = messageDoc['timestamp'];
@@ -101,10 +106,6 @@ class _ChatListState extends State<ChatList> {
             borderRadius: BorderRadius.all(Radius.circular(25.0)),
             clipBehavior: Clip.hardEdge,
           ),
-//          padding: EdgeInsets.only(right: 12.0),
-//          decoration: new BoxDecoration(
-//              border: new Border(
-//                  right: new BorderSide(width: 1.0, color: Colors.black26))),
         ),
 
       title:  new Container(
@@ -136,14 +137,11 @@ class _ChatListState extends State<ChatList> {
                   new Chat(
                       peerId: userDoc.documentID,
                       peerAvatar: photoUrl,
-                      toPushId: userDoc['pushId']
+                      toPushId: userDoc['pushId'],
+                    title:userDoc['nickName'],
                   )));
         },
-//        color: Colors.white,
-//        padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-//        shape: RoundedRectangleBorder(),
       ),
-      //margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
     );
   }
 
@@ -151,6 +149,7 @@ class _ChatListState extends State<ChatList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: appbarColor,
         title: Text(
           'Message',
         ),

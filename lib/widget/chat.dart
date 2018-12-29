@@ -17,12 +17,14 @@ class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
   final String toPushId;
+  final String title;
 
   Chat(
       {Key key,
       @required this.peerId,
       @required this.peerAvatar,
-      this.toPushId})
+      this.toPushId,
+      this.title})
       : super(key: key);
 
   @override
@@ -30,7 +32,7 @@ class Chat extends StatelessWidget {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(
-          'CHAT',
+          title != null ? title : "Chat",
         ),
         //centerTitle: true,
       ),
@@ -69,7 +71,7 @@ class ChatScreenState extends State<ChatScreen> {
   String id;
   String toPushId;
 
-  var listMessage =[];
+  var listMessage = [];
   String groupChatId;
   SharedPreferences prefs;
 
@@ -107,12 +109,14 @@ class ChatScreenState extends State<ChatScreen> {
         .collection(widget.peerId)
         .orderBy('timestamp', descending: true)
         .limit(20);
+
     FIRESTORE
         .collection('users')
         .document(id)
         .collection("user_messages")
         .document(peerId)
         .updateData({'unRead': false});
+
     readLocal();
   }
 
@@ -284,7 +288,7 @@ class ChatScreenState extends State<ChatScreen> {
               ? Container(
                   child: Text(
                     document['content'],
-                    style: TextStyle(color: primaryColor),
+                    style: TextStyle(color: Colors.black87, fontSize: 17),
                   ),
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                   width: 200.0,
@@ -297,47 +301,56 @@ class ChatScreenState extends State<ChatScreen> {
                 )
               : document['type'] == 1
                   // Image
-                  ? Container(
-                      child: Material(
-                        child: CachedNetworkImage(
-                          placeholder: Container(
-                            child: CircularProgressIndicator(
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(themeColor),
+                  ? GestureDetector(
+                      child: Container(
+                        child: Material(
+                          child: CachedNetworkImage(
+                            placeholder: Container(
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(themeColor),
+                              ),
+                              width: 200.0,
+                              height: 200.0,
+                              padding: EdgeInsets.all(70.0),
+                              decoration: BoxDecoration(
+                                color: subColor2,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(8.0),
+                                ),
+                              ),
                             ),
-                            width: 200.0,
-                            height: 200.0,
-                            padding: EdgeInsets.all(70.0),
-                            decoration: BoxDecoration(
-                              color: subColor2,
+                            errorWidget: Material(
+                              child: Image.asset(
+                                'images/img_not_available.jpeg',
+                                width: 200.0,
+                                height: 200.0,
+                                fit: BoxFit.cover,
+                              ),
                               borderRadius: BorderRadius.all(
                                 Radius.circular(8.0),
                               ),
+                              clipBehavior: Clip.hardEdge,
                             ),
+                            imageUrl: document['content'],
+                            width: 200.0,
+                            height: 200.0,
+                            fit: BoxFit.cover,
                           ),
-                          errorWidget: Material(
-                            child: Image.asset(
-                              'images/img_not_available.jpeg',
-                              width: 200.0,
-                              height: 200.0,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(8.0),
-                            ),
-                            clipBehavior: Clip.hardEdge,
-                          ),
-                          imageUrl: document['content'],
-                          width: 200.0,
-                          height: 200.0,
-                          fit: BoxFit.cover,
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                          clipBehavior: Clip.hardEdge,
                         ),
-                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                        clipBehavior: Clip.hardEdge,
+                        margin: EdgeInsets.only(
+                            bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                            right: 10.0),
                       ),
-                      margin: EdgeInsets.only(
-                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                          right: 10.0),
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            new MaterialPageRoute(
+                                builder: (context) =>
+                                    new Image.network(document['content'])));
+                      },
                     )
                   // Sticker
                   : Container(
@@ -389,56 +402,65 @@ class ChatScreenState extends State<ChatScreen> {
                     ? Container(
                         child: Text(
                           document['content'],
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.white, fontSize: 17),
                         ),
                         padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                         width: 200.0,
                         decoration: BoxDecoration(
-                            color: primaryColor,
+                            color: themeColor,
                             borderRadius: BorderRadius.circular(8.0)),
                         margin: EdgeInsets.only(left: 10.0),
                       )
                     : document['type'] == 1
-                        ? Container(
-                            child: Material(
-                              child: CachedNetworkImage(
-                                placeholder: Container(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        themeColor),
+                        ? GestureDetector(
+                            child: Container(
+                              child: Material(
+                                child: CachedNetworkImage(
+                                  placeholder: Container(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          themeColor),
+                                    ),
+                                    width: 200.0,
+                                    height: 200.0,
+                                    padding: EdgeInsets.all(70.0),
+                                    decoration: BoxDecoration(
+                                      color: subColor2,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8.0),
+                                      ),
+                                    ),
                                   ),
-                                  width: 200.0,
-                                  height: 200.0,
-                                  padding: EdgeInsets.all(70.0),
-                                  decoration: BoxDecoration(
-                                    color: subColor2,
+                                  errorWidget: Material(
+                                    child: Image.asset(
+                                      'images/img_not_available.jpeg',
+                                      width: 200.0,
+                                      height: 200.0,
+                                      fit: BoxFit.cover,
+                                    ),
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(8.0),
                                     ),
+                                    clipBehavior: Clip.hardEdge,
                                   ),
+                                  imageUrl: document['content'],
+                                  width: 200.0,
+                                  height: 200.0,
+                                  fit: BoxFit.cover,
                                 ),
-                                errorWidget: Material(
-                                  child: Image.asset(
-                                    'images/img_not_available.jpeg',
-                                    width: 200.0,
-                                    height: 200.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(8.0),
-                                  ),
-                                  clipBehavior: Clip.hardEdge,
-                                ),
-                                imageUrl: document['content'],
-                                width: 200.0,
-                                height: 200.0,
-                                fit: BoxFit.cover,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8.0)),
+                                clipBehavior: Clip.hardEdge,
                               ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8.0)),
-                              clipBehavior: Clip.hardEdge,
+                              margin: EdgeInsets.only(left: 10.0),
                             ),
-                            margin: EdgeInsets.only(left: 10.0),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  new MaterialPageRoute(
+                                      builder: (context) => new Image.network(
+                                          document['content'])));
+                            },
                           )
                         : Container(
                             child: new Image.asset(
@@ -672,7 +694,7 @@ class ChatScreenState extends State<ChatScreen> {
               child: new IconButton(
                 icon: new Icon(Icons.image),
                 onPressed: getImage,
-                color: primaryColor,
+                color: themeColor,
               ),
             ),
             color: Colors.white,
@@ -683,7 +705,7 @@ class ChatScreenState extends State<ChatScreen> {
               child: new IconButton(
                 icon: new Icon(Icons.face),
                 onPressed: getSticker,
-                color: primaryColor,
+                color: themeColor,
               ),
             ),
             color: Colors.white,
@@ -693,7 +715,7 @@ class ChatScreenState extends State<ChatScreen> {
           Flexible(
             child: Container(
               child: TextField(
-                style: TextStyle(color: primaryColor, fontSize: 15.0),
+                style: TextStyle(color: Colors.black87, fontSize: 16.0),
                 controller: textEditingController,
                 decoration: InputDecoration.collapsed(
                   hintText: 'Type your message...',
@@ -711,7 +733,7 @@ class ChatScreenState extends State<ChatScreen> {
               child: new IconButton(
                 icon: new Icon(Icons.send),
                 onPressed: () => onSendMessage(textEditingController.text, 0),
-                color: primaryColor,
+                color: themeColor,
               ),
             ),
             color: Colors.white,
@@ -757,12 +779,13 @@ class ChatScreenState extends State<ChatScreen> {
                   .document(widget.peerId)
                   .collection(widget.peerId)
                   .orderBy('timestamp', descending: true)
-                  .limit(50).snapshots(),
+                  .limit(50)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return SET_LOADING();
                 } else {
-                  listMessage=snapshot.data.documents;
+                  listMessage = snapshot.data.documents;
                   //listMessage =listMessage..addAll(snapshot.data.documents);
                   //lastMessage = listMessage[listMessage.length - 1];
                   return ListView.builder(

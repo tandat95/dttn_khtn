@@ -48,8 +48,8 @@ class _GroupInfo extends StatelessWidget {
           labelText: label,
           labelStyle: TextStyle(color: themeColor),
           helperStyle: TextStyle(color: themeColor),
-          enabledBorder: const OutlineInputBorder(
-            borderSide: const BorderSide(color: themeColor, width: 0.5),
+          enabledBorder:  OutlineInputBorder(
+            borderSide:  BorderSide(color: themeColor, width: 0.5),
             borderRadius: const BorderRadius.all(Radius.circular(10.0)),
           ),
           border: const OutlineInputBorder(
@@ -90,12 +90,12 @@ class _GroupInfo extends StatelessWidget {
             labelText: 'Gender',
             labelStyle: TextStyle(color: themeColor),
             helperStyle: TextStyle(color: themeColor),
-            enabledBorder: const OutlineInputBorder(
-              borderSide: const BorderSide(color: themeColor, width: 0.5),
-              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+            enabledBorder:  OutlineInputBorder(
+              borderSide:  BorderSide(color: themeColor, width: 0.5),
+              borderRadius:  BorderRadius.all(Radius.circular(10.0)),
             ),
-            border: const OutlineInputBorder(
-              borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+            border:  OutlineInputBorder(
+              borderRadius:  BorderRadius.all(Radius.circular(10.0)),
             ),
           ),
           value: user.gender,
