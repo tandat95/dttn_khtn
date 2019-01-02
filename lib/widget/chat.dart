@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -11,14 +10,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dttn_khtn/loginAPI.dart';
-import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 
 class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
   final String toPushId;
   final String title;
-
   Chat(
       {Key key,
       @required this.peerId,

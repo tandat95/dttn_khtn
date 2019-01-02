@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const HORIZONTAL = 0;
 const VERTICAL = 1;
@@ -27,8 +28,10 @@ const DEFAULT_PHOTO_URL = "https://firebasestorage.googleapis.com/v0/b/testnotif
 const UNKNOW_USER = 'Unknow user';
 const USER_NOT_EXIST = 'User not exist!';
 const NOTHING_TO_SEND = 'Nothing to send!';
+const THEME_COLOR = 'ThemeColor';
 
 Firestore FIRESTORE;
+SharedPreferences SHARED_PREFERRENT;
 
 int TAB_INDEX = 0;
 bool NEW_MES = false;

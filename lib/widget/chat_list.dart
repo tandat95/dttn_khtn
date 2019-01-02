@@ -15,31 +15,29 @@ class ChatList extends StatefulWidget {
 }
 
 class _ChatListState extends State<ChatList> {
-
-
   bool isLoading = false;
   Color appbarColor;
+  bool stateDel;
+  List<String> listDel = [];
   List<Choice> choices = const <Choice>[
     const Choice(title: 'Delete message', icon: Icons.delete),
     //const Choice(title: 'Log out', icon: Icons.exit_to_app),
   ];
 
-
   @override
   void initState() {
     appbarColor = themeColor;
+    stateDel = false;
   }
 
   String buildLastTime(messageDoc) {
     var time = messageDoc['timestamp'];
     if (time != null) {
       int delta =
-          DateTime
-              .now()
-              .millisecondsSinceEpoch - int.parse(time.toString());
+          DateTime.now().millisecondsSinceEpoch - int.parse(time.toString());
       delta = (delta / 1000).floor();
       if (delta < 60) {
-        if(delta<0) delta = 0;
+        if (delta < 0) delta = 0;
         return '$delta sec';
       } else if (delta / 60 < 60) {
         delta = (delta / 60).floor();
@@ -76,17 +74,66 @@ class _ChatListState extends State<ChatList> {
     }
     return Text(
       content,
-      style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.bold),
+      style: TextStyle(
+          color: textColor, fontSize: 13, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget buildTrailing(userId,messageDoc, mesId) {
+    bool ckValue = false;
+    if (!stateDel) {
+      return Text(
+        buildLastTime(messageDoc),
+        style: TextStyle(fontSize: 12),
+      );
+    }
+    return IconButton(
+      icon: Icon(
+        Icons.delete,
+        color: themeColor,
+      ),
+      onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: new Text("Delete message"),
+                content: new Text("Do you want to delete this conversation?"),
+                actions: <Widget>[
+                  new FlatButton(
+                    child: new Text("Yes", style: TextStyle(color: themeColor),),
+                    onPressed: () {
+                      FIRESTORE
+                          .collection("users")
+                          .document(userId)
+                          .collection('user_messages').document(mesId).delete().then((snap){
+                      });
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  new FlatButton(
+                    child: new Text("No", style: TextStyle(color: themeColor),),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+      },
     );
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot userDoc,
       DocumentSnapshot messageDoc) {
-    var photoUrl = userDoc['photoUrl']!=null? userDoc['photoUrl']: DEFAULT_PHOTO_URL;
-    var nickName = userDoc['nickName']!=null?userDoc['nickName']: UNKNOW_USER;
+    var photoUrl =
+        userDoc['photoUrl'] != null ? userDoc['photoUrl'] : DEFAULT_PHOTO_URL;
+    var nickName =
+        userDoc['nickName'] != null ? userDoc['nickName'] : UNKNOW_USER;
     return Container(
       child: ListTile(
-        leading:Container(
+        leading: Container(
           child: Material(
             child: CachedNetworkImage(
               placeholder: Container(
@@ -107,42 +154,57 @@ class _ChatListState extends State<ChatList> {
             clipBehavior: Clip.hardEdge,
           ),
         ),
-
-      title:  new Container(
-        child: Text(
-          nickName,
-          style: TextStyle(
-              color: Colors.black87,
-              //fontWeight: FontWeight.bold,
-              fontSize: 16),
+        title: new Container(
+          child: Text(
+            nickName,
+            style: TextStyle(
+                color: Colors.black87,
+                //fontWeight: FontWeight.bold,
+                fontSize: 16),
+          ),
+          alignment: Alignment.centerLeft,
+          margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
         ),
-        alignment: Alignment.centerLeft,
-        margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
-      ),
         subtitle: new Container(
           child: buildLastContent(messageDoc),
           alignment: Alignment.centerLeft,
           margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
         ),
-        trailing: Text(
-          buildLastTime(messageDoc),
-          style: TextStyle(fontSize: 12),
-        ),
-
+        trailing: buildTrailing(widget.currentUserId,messageDoc, messageDoc.documentID),
         onTap: () {
           Navigator.push(
               context,
               new MaterialPageRoute(
-                  builder: (context) =>
-                  new Chat(
-                      peerId: userDoc.documentID,
-                      peerAvatar: photoUrl,
-                      toPushId: userDoc['pushId'],
-                    title:userDoc['nickName'],
-                  )));
+                  builder: (context) => new Chat(
+                        peerId: userDoc.documentID,
+                        peerAvatar: photoUrl,
+                        toPushId: userDoc['pushId'],
+                        title: userDoc['nickName'],
+                      )));
+        },
+        onLongPress: () {
+          setState(() {
+            stateDel = true;
+          });
         },
       ),
     );
+  }
+
+  List<Widget> buildAction() {
+    if (stateDel) {
+      return <Widget>[
+        FlatButton(
+          child: Text("OK", style: TextStyle(color: Colors.white),),
+          onPressed: () {
+            setState(() {
+              stateDel = false;
+            });
+          },
+        )
+      ];
+    }
+    return null;
   }
 
   @override
@@ -153,6 +215,7 @@ class _ChatListState extends State<ChatList> {
         title: Text(
           'Message',
         ),
+        actions: buildAction(),
 //        actions: <Widget>[
 //          PopupMenuButton<Choice>(
 //            itemBuilder: (BuildContext context) {
@@ -213,7 +276,7 @@ class _ChatListState extends State<ChatList> {
                               return Center(
                                 child: RefreshProgressIndicator(
                                   valueColor:
-                                  AlwaysStoppedAnimation<Color>(themeColor),
+                                      AlwaysStoppedAnimation<Color>(themeColor),
                                 ),
                               );
                             } else {
@@ -221,24 +284,6 @@ class _ChatListState extends State<ChatList> {
                             }
                           },
                         );
-//                        return new FutureBuilder(
-//                            future: Firestore.instance
-//                                .collection('users')
-//                                .document(
-//                                    messDoc.documentID)
-//                                .get(),
-//                            builder: (context, snapshot) {
-//                              return snapshot.connectionState ==
-//                                      ConnectionState.done
-//                                  ? buildItem(context, snapshot.data, messDoc)
-//                                  : Center(
-//                                      child: RefreshProgressIndicator(
-//                                        valueColor:
-//                                            AlwaysStoppedAnimation<Color>(
-//                                                themeColor),
-//                                      ),
-//                                    );
-//                            });
                       },
                       itemCount: snapshot.data.documents.length,
                     );
@@ -251,13 +296,13 @@ class _ChatListState extends State<ChatList> {
             Positioned(
               child: isLoading
                   ? Container(
-                child: Center(
-                  child: CircularProgressIndicator(
-                      valueColor:
-                      AlwaysStoppedAnimation<Color>(themeColor)),
-                ),
-                color: Colors.white.withOpacity(0.8),
-              )
+                      child: Center(
+                        child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(themeColor)),
+                      ),
+                      color: Colors.white.withOpacity(0.8),
+                    )
                   : Container(),
             ),
           ],
