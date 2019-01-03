@@ -24,7 +24,8 @@ const FOLLOWER = 'follower';
 const GGLOGIN = 'googleLogin';
 const EMAILLOGIN = 'emailLogin';
 const EMAILREG = 'emailReg';
-const DEFAULT_PHOTO_URL = "https://firebasestorage.googleapis.com/v0/b/testnotification-29624.appspot.com/o/avatar_default.png?alt=media&token=d21ab19e-17a9-4746-bf57-edd1aca8916a";
+const DEFAULT_PHOTO_URL =
+    "https://firebasestorage.googleapis.com/v0/b/testnotification-29624.appspot.com/o/avatar_default.png?alt=media&token=d21ab19e-17a9-4746-bf57-edd1aca8916a";
 const UNKNOW_USER = 'Unknow user';
 const USER_NOT_EXIST = 'User not exist!';
 const NOTHING_TO_SEND = 'Nothing to send!';
@@ -57,8 +58,8 @@ void setUnReadMesStatus(String userId, bool isRead) {
   }
 }
 
-Widget SET_LOADING (){
- return Center(
+Widget SET_LOADING() {
+  return Center(
     child: RefreshProgressIndicator(
       valueColor: AlwaysStoppedAnimation<Color>(themeColor),
     ),

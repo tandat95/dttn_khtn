@@ -10,7 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dttn_khtn/loginAPI.dart';
-
+import 'package:flutter_native_image/flutter_native_image.dart';
 class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
@@ -134,14 +134,18 @@ class ChatScreenState extends State<ChatScreen> {
     } else {
       groupChatId = '$peerId-$id';
     }
-
     setState(() {});
   }
 
   Future getImage() async {
     imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
 
+    //imageFile = result;
+
     if (imageFile != null) {
+      print(imageFile.path);
+      File compressedFile = await FlutterNativeImage.compressImage(imageFile.path, quality: 20, percentage: 100);
+      imageFile = compressedFile;
       setState(() {
         isLoading = true;
       });
