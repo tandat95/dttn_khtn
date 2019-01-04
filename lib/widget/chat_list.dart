@@ -79,7 +79,7 @@ class _ChatListState extends State<ChatList> {
     );
   }
 
-  Widget buildTrailing(userId,messageDoc, mesId) {
+  Widget buildTrailing(userId, messageDoc, mesId) {
     bool ckValue = false;
     if (!stateDel) {
       return Text(
@@ -93,34 +93,42 @@ class _ChatListState extends State<ChatList> {
         color: themeColor,
       ),
       onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: new Text("Delete message"),
-                content: new Text("Do you want to delete this conversation?"),
-                actions: <Widget>[
-                  new FlatButton(
-                    child: new Text("Yes", style: TextStyle(color: themeColor),),
-                    onPressed: () {
-                      FIRESTORE
-                          .collection("users")
-                          .document(userId)
-                          .collection('user_messages').document(mesId).delete().then((snap){
-                      });
-                      Navigator.of(context).pop();
-                    },
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: new Text("Delete message"),
+              content: new Text("Do you want to delete this conversation?"),
+              actions: <Widget>[
+                new FlatButton(
+                  child: new Text(
+                    "Yes",
+                    style: TextStyle(color: themeColor),
                   ),
-                  new FlatButton(
-                    child: new Text("No", style: TextStyle(color: themeColor),),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
+                  onPressed: () {
+                    FIRESTORE
+                        .collection("users")
+                        .document(userId)
+                        .collection('user_messages')
+                        .document(mesId)
+                        .delete()
+                        .then((snap) {});
+                    Navigator.of(context).pop();
+                  },
+                ),
+                new FlatButton(
+                  child: new Text(
+                    "No",
+                    style: TextStyle(color: themeColor),
                   ),
-                ],
-              );
-            },
-          );
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }
@@ -170,7 +178,8 @@ class _ChatListState extends State<ChatList> {
           alignment: Alignment.centerLeft,
           margin: new EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
         ),
-        trailing: buildTrailing(widget.currentUserId,messageDoc, messageDoc.documentID),
+        trailing: buildTrailing(
+            widget.currentUserId, messageDoc, messageDoc.documentID),
         onTap: () {
           Navigator.push(
               context,
@@ -181,6 +190,12 @@ class _ChatListState extends State<ChatList> {
                         toPushId: userDoc['pushId'],
                         title: userDoc['nickName'],
                       )));
+          FIRESTORE
+              .collection('users')
+              .document(widget.currentUserId)
+              .collection("user_messages")
+              .document(userDoc.documentID)
+              .updateData({'unRead': false});
         },
         onLongPress: () {
           setState(() {
@@ -195,7 +210,10 @@ class _ChatListState extends State<ChatList> {
     if (stateDel) {
       return <Widget>[
         FlatButton(
-          child: Text("OK", style: TextStyle(color: Colors.white),),
+          child: Text(
+            "OK",
+            style: TextStyle(color: Colors.white),
+          ),
           onPressed: () {
             setState(() {
               stateDel = false;
@@ -245,7 +263,6 @@ class _ChatListState extends State<ChatList> {
       body: WillPopScope(
         child: Stack(
           children: <Widget>[
-            // List
             Container(
               child: StreamBuilder(
                 stream: FIRESTORE
@@ -262,7 +279,7 @@ class _ChatListState extends State<ChatList> {
                       ),
                     );
                   } else {
-                    return ListView.builder(
+                    return ListView.separated(
                       padding: EdgeInsets.all(5.0),
                       itemBuilder: (context, index) {
                         var messDoc = snapshot.data.documents[index];
@@ -286,6 +303,10 @@ class _ChatListState extends State<ChatList> {
                         );
                       },
                       itemCount: snapshot.data.documents.length,
+                      separatorBuilder: (BuildContext context, int index) =>
+                          Divider(
+                            height: 3,
+                          ),
                     );
                   }
                 },

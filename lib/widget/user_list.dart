@@ -11,11 +11,15 @@ class Choice {
   final IconData icon;
   final String mode; // 'ALL', 'FOLLOWING'
 }
+class ListUser extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() =>ListUserState();
+}
+class ListUserState extends State<ListUser> with AutomaticKeepAliveClientMixin<ListUser>{
 
-class ListUser extends StatelessWidget {
-  //bool isLoading = false;
-
-  ListUser();
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
@@ -62,9 +66,15 @@ const List<Choice> choices = const <Choice>[
   const Choice(title: 'All player', mode: 'ALL'),
   const Choice(title: 'Followed', mode: 'FOLLOWING'),
 ];
-
-class ChoiceCard extends StatelessWidget {
+class ChoiceCard extends StatefulWidget {
   const ChoiceCard({Key key, this.choice}) : super(key: key);
+  final Choice choice;
+
+  @override
+  State<StatefulWidget> createState() => ChoiceCardState(this.choice);
+}
+class ChoiceCardState extends State<ChoiceCard> with AutomaticKeepAliveClientMixin<ChoiceCard> {
+  ChoiceCardState(this.choice);
   final Choice choice;
   final bool isLoading = false;
 
@@ -105,13 +115,7 @@ class ChoiceCard extends StatelessWidget {
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
-    return Card(
-      elevation: 2.0,
-      margin: new EdgeInsets.symmetric(horizontal: 3.0, vertical: 2.0),
-      child: Container(
-        //decoration: BoxDecoration(color: Color.fromRGBO(64, 75, 96, .9)),
-        child: Container(
-          child: ListTile(
+    return  ListTile(
             leading: Material(
               child: CachedNetworkImage(
                 placeholder: Container(
@@ -168,12 +172,8 @@ class ChoiceCard extends StatelessWidget {
                       )));
             },
             //color: subColor2,
-          ),
-          // margin: EdgeInsets.only(bottom: 3.0, left: 3.0, right: 3.0),
-        ),
-      ),
-    );
-
+          );
+          // margin: EdgeInsets.only(bottom: 3.0, left: 3.0, right: 3.0)
   }
 
   @override
@@ -204,13 +204,16 @@ class ChoiceCard extends StatelessWidget {
                     }
                     documents = listDocument;
                   }
-                  return ListView.builder(
+                  return ListView.separated(
                     padding: EdgeInsets.all(10.0),
                     itemBuilder: (context, index) =>
                         buildItem(context, documents[index]),
                     itemCount: choice.mode == "FOLLOWING"
                         ? FOLLOWED_LIST.length
                         : snapshot.data.documents.length,
+                    separatorBuilder: (BuildContext context, int index) => Divider(
+                      height: 5,
+                    ),
                   );
                 }
               },
@@ -235,4 +238,8 @@ class ChoiceCard extends StatelessWidget {
       onWillPop: () {},
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

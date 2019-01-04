@@ -6,7 +6,6 @@ class Setting extends StatefulWidget {
   final VoidCallback onSignout;
 
   const Setting({Key key, @required this.onSignout}) : super(key: key);
-
   @override
   State<StatefulWidget> createState() => SettingState(this.onSignout);
 }

@@ -10,17 +10,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:dttn_khtn/model/user.dart';
 import 'package:dttn_khtn/loginAPI.dart';
-import 'package:dttn_khtn/widget/chat.dart';
-
-//class _GroupInfo extends StatefulWidget {
-//  const _GroupInfo({Key key, @required this.user,@required this.isMyProfile})
-//      : super(key: key);
-//  final User user;
-//  final bool isMyProfile;
-//
-//  @override
-//  _GroupInfoState createState() => _GroupInfoState();
-//}
+import 'package:flutter_native_image/flutter_native_image.dart';
 
 class _GroupInfo extends StatelessWidget {
   final User user;
@@ -282,7 +272,24 @@ class MyProfileState extends State<MyProfile> {
   //get image from gallery
   Future getImage() async {
     imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+
     if (imageFile != null) {
+      int quality;
+      if (imageFile.lengthSync() / 1000 < 1000) {
+        quality = 20;
+      } else if (imageFile.lengthSync() / 1000 < 3000) {
+        quality = 15;
+      } else if (imageFile.lengthSync() / 1000 < 6000) {
+        quality = 10;
+      } else {
+        quality = 5;
+      }
+
+      File compressedFile = await FlutterNativeImage.compressImage(
+          imageFile.path,
+          quality: quality,
+          percentage: 100);
+      imageFile = compressedFile;
       setState(() {
         isLoading = true;
       });
@@ -390,28 +397,29 @@ class MyProfileState extends State<MyProfile> {
 //                    ));
                   },
                 ),
-                PopupMenuButton<AppBarBehavior>(
-                  onSelected: (AppBarBehavior value) {
-                    setState(() {
-                      _appBarBehavior = value;
-                    });
-                  },
-                  itemBuilder: (BuildContext context) =>
-                      <PopupMenuItem<AppBarBehavior>>[
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.normal,
-                            child: Text('App bar scrolls away')),
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.pinned,
-                            child: Text('App bar stays put')),
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.floating,
-                            child: Text('App bar floats')),
-                        const PopupMenuItem<AppBarBehavior>(
-                            value: AppBarBehavior.snapping,
-                            child: Text('App bar snaps')),
-                      ],
-                ),
+//                PopupMenuButton<AppBarBehavior>(
+//                  onSelected: (AppBarBehavior value) {
+//                    setState(() {
+//                      _appBarBehavior = value;
+//                    });
+//                  },
+
+//                  itemBuilder: (BuildContext context) =>
+//                      <PopupMenuItem<AppBarBehavior>>[
+//                        const PopupMenuItem<AppBarBehavior>(
+//                            value: AppBarBehavior.normal,
+//                            child: Text('App bar scrolls away')),
+//                        const PopupMenuItem<AppBarBehavior>(
+//                            value: AppBarBehavior.pinned,
+//                            child: Text('App bar stays put')),
+//                        const PopupMenuItem<AppBarBehavior>(
+//                            value: AppBarBehavior.floating,
+//                            child: Text('App bar floats')),
+//                        const PopupMenuItem<AppBarBehavior>(
+//                            value: AppBarBehavior.snapping,
+//                            child: Text('App bar snaps')),
+//                      ],
+//                ),
               ],
               flexibleSpace: FlexibleSpaceBar(
                 title: StreamBuilder(

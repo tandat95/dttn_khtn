@@ -7,16 +7,6 @@ import 'dart:io';
 import 'package:dttn_khtn/model/user.dart';
 import 'package:dttn_khtn/widget/chat.dart';
 
-//class _GroupInfo extends StatefulWidget {
-//  const _GroupInfo({Key key, @required this.user,@required this.isMyProfile})
-//      : super(key: key);
-//  final User user;
-//  final bool isMyProfile;
-//
-//  @override
-//  _GroupInfoState createState() => _GroupInfoState();
-//}
-
 class _GroupInfo extends StatelessWidget {
   final DocumentSnapshot document;
 

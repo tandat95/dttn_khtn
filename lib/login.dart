@@ -155,10 +155,10 @@ class _LoginPageState extends State<LoginPage> {
             Buttons.Google,
             onPressed:()=>  validateAndSubmit(GGLOGIN),
           ),
-          SignInButton(
-            Buttons.Facebook,
-            onPressed: () {},
-          )
+//          SignInButton(
+//            Buttons.Facebook,
+//            onPressed: () {},
+//          )
         ];
       case FormType.register:
         return [

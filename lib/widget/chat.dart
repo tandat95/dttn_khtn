@@ -11,11 +11,14 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dttn_khtn/loginAPI.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
+import 'package:photo_view/photo_view.dart';
+
 class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
   final String toPushId;
   final String title;
+
   Chat(
       {Key key,
       @required this.peerId,
@@ -106,14 +109,6 @@ class ChatScreenState extends State<ChatScreen> {
         .collection(widget.peerId)
         .orderBy('timestamp', descending: true)
         .limit(20);
-
-    FIRESTORE
-        .collection('users')
-        .document(id)
-        .collection("user_messages")
-        .document(peerId)
-        .updateData({'unRead': false});
-
     readLocal();
   }
 
@@ -139,12 +134,22 @@ class ChatScreenState extends State<ChatScreen> {
 
   Future getImage() async {
     imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
-
     //imageFile = result;
-
     if (imageFile != null) {
-      print(imageFile.path);
-      File compressedFile = await FlutterNativeImage.compressImage(imageFile.path, quality: 20, percentage: 100);
+      int quality;
+      if (imageFile.lengthSync() / 1000 < 1000) {
+        quality = 20;
+      } else if (imageFile.lengthSync() / 1000 < 3000) {
+        quality = 15;
+      } else if (imageFile.lengthSync() / 1000 < 6000) {
+        quality = 10;
+      } else {
+        quality = 5;
+      }
+      File compressedFile = await FlutterNativeImage.compressImage(
+          imageFile.path,
+          quality: quality,
+          percentage: 100);
       imageFile = compressedFile;
       setState(() {
         isLoading = true;
@@ -347,10 +352,12 @@ class ChatScreenState extends State<ChatScreen> {
                       ),
                       onTap: () {
                         Navigator.push(
-                            context,
-                            new MaterialPageRoute(
-                                builder: (context) =>
-                                    new Image.network(document['content'])));
+                          context,
+                          new MaterialPageRoute(
+                              builder: (context) => PhotoView(
+                                  imageProvider:
+                                      NetworkImage(document['content']))),
+                        );
                       },
                     )
                   // Sticker
@@ -457,10 +464,14 @@ class ChatScreenState extends State<ChatScreen> {
                             ),
                             onTap: () {
                               Navigator.push(
-                                  context,
-                                  new MaterialPageRoute(
-                                      builder: (context) => new Image.network(
-                                          document['content'])));
+                                context,
+                                new MaterialPageRoute(
+
+                                    builder: (context) => PhotoView(
+                                        imageProvider:
+                                            NetworkImage(document['content']))),
+
+                              );
                             },
                           )
                         : Container(

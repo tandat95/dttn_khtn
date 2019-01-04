@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:dttn_khtn/widget/user_list.dart';
@@ -9,8 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dttn_khtn/common/constants.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:dttn_khtn/widget/setting.dart';
-import 'package:dttn_khtn/widget/make_money.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title, this.user, this.onSignOut})
@@ -50,9 +47,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
-    _firebaseMessaging.getToken().then((token) {
-      print('token: $token');
-    });
+//    _firebaseMessaging.getToken().then((token) {
+//      //print('token: $token');
+//    });
   }
 
   DatabaseReference notesReference = FirebaseDatabase.instance
@@ -118,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
           builder: (context, snapshot) {
             if (!(snapshot.connectionState == ConnectionState.done)) {
               //return SET_LOADING();
-              return new ListUser();
+              return ListUser();
             } else {
               if (snapshot.data[FOLLOWING] == null) {
                 FIRESTORE
@@ -132,14 +129,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   FOLLOWED_LIST.add(snapshot.data[FOLLOWING][i].toString());
                 }
               }
-              return new ListUser();
+              return ListUser();
             }
           }),
-      new ChatList(
+       ChatList(
         currentUserId: widget.user.uid,
       ),
-      new MyProfile(user: widget.user),
-      new Setting(onSignout: widget.onSignOut,)
+       MyProfile(user: widget.user),
+       Setting(onSignout: widget.onSignOut,)
       //new MakeMoney()
     ];
     return Scaffold(
