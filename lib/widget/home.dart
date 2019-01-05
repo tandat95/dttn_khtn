@@ -20,12 +20,13 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage>with SingleTickerProviderStateMixin {
   int _currentIndex;
   bool _unReadMes;
   static String id;
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   StreamSubscription<Event> _onNoteChangeSubscription;
+  Future _future;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _onNoteChangeSubscription = notesReference.onValue.listen(_onNoteChanged);
     _currentIndex = TAB_INDEX;
     _unReadMes = TAB_INDEX != 1 && NEW_MES;
+    _future = FIRESTORE.collection('users').document(CURRENT_USER.uid).get();
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) {
         print('on message $message');
@@ -110,8 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //widget.user.uid
     final List<Widget> _children = [
       FutureBuilder(
-          future:
-              FIRESTORE.collection('users').document(CURRENT_USER.uid).get(),
+          future: _future,
           builder: (context, snapshot) {
             if (!(snapshot.connectionState == ConnectionState.done)) {
               //return SET_LOADING();
@@ -132,11 +133,13 @@ class _MyHomePageState extends State<MyHomePage> {
               return ListUser();
             }
           }),
-       ChatList(
+      ChatList(
         currentUserId: widget.user.uid,
       ),
-       MyProfile(user: widget.user),
-       Setting(onSignout: widget.onSignOut,)
+      MyProfile(user: widget.user),
+      Setting(
+        onSignout: widget.onSignOut,
+      )
       //new MakeMoney()
     ];
     return Scaffold(
@@ -144,30 +147,27 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
             // sets the background color of the `BottomNavigationBar`
-            canvasColor: themeColor,
+            //canvasColor: themeColor,
             // sets the active color of the `BottomNavigationBar` if `Brightness` is light
-            primaryColor: Colors.red,
+            primaryColor: themeColor,
             textTheme: Theme.of(context).textTheme.copyWith()),
         child: BottomNavigationBar(
           onTap: onTabTapped,
           currentIndex: _currentIndex,
+          type: BottomNavigationBarType.fixed,
           items: [
             BottomNavigationBarItem(
-              icon: new Icon(Icons.home),
-              title: new Text('Home'),
+              icon:  Icon(Icons.home),
+              title:  Text('Home'),
             ),
             BottomNavigationBarItem(
               icon: setMesIcon(),
-              title: new Text('Messages'),
+              title:  Text('Messages'),
             ),
             BottomNavigationBarItem(
                 icon: Icon(Icons.person), title: Text('Profile')),
             BottomNavigationBarItem(
                 icon: Icon(Icons.settings), title: Text('Setting')),
-//              BottomNavigationBarItem(
-//                  icon: Icon(Icons.attach_money),
-//                  title: Text('Make money')
-//              )
           ],
         ),
       ),

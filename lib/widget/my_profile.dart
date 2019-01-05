@@ -225,7 +225,10 @@ class MyProfile extends StatefulWidget {
 
 enum AppBarBehavior { normal, pinned, floating, snapping }
 
-class MyProfileState extends State<MyProfile> {
+class MyProfileState extends State<MyProfile> with AutomaticKeepAliveClientMixin<MyProfile>{
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
   static final GlobalKey<ScaffoldState> _scaffoldKey =
       GlobalKey<ScaffoldState>();
   final double _appBarHeight = 256.0;
@@ -571,4 +574,6 @@ class MyProfileState extends State<MyProfile> {
       ),
     );
   }
+
+
 }
